@@ -1,7 +1,9 @@
-export const PescaHome = () => {
+import { Navbar } from "../../../shared/components/Navbar";
+
+export const Pesca = () => {
   return (
     <div>
-      <h1>Pesca</h1>
+      <Navbar items={null} />
     </div>
   );
 };
