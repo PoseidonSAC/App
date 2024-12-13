@@ -1,6 +1,7 @@
 import { Outlet, Navigate } from "react-router-dom";
 import { ReactNode } from "react";
 import { useAuth } from "../../../auth/context/useContext";
+import { Navbar } from "../../../shared/components/Navbar";
 
 export interface ProtectedRoutesProps {
   children: ReactNode | null;
@@ -11,5 +12,13 @@ export const ProtectedRoutes = ({ children }: ProtectedRoutesProps) => {
   if (!isAuthenticated) {
     return <Navigate to="/" />;
   }
-  return children ? children : <Outlet />;
+  const hideNavbarRoutes = ["/inicio"];
+  return children ? (
+    children
+  ) : (
+    <>
+      {!hideNavbarRoutes.includes(location.pathname) && <Navbar items={null} />}
+      <Outlet />
+    </>
+  );
 };

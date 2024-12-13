@@ -1,14 +1,46 @@
-import { useState } from "react";
-import { PescaContext } from "./context";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { BoatContext } from "./context";
+import { BoatService } from "../../services/boat.service";
+import { BoatDto, BoatResDto } from "./../../domain/dto/boat.dto";
+import { ContextProviderProps } from "./../../../shared/types/contextProviderProps";
 
-export interface PescaProviderProps {
-  children: React.ReactNode | React.ReactNode[];
-}
+export const BoatProvider = ({ children }: ContextProviderProps) => {
+  const service = new BoatService();
+  const [boats, setBoats] = useState<BoatResDto[]>([]);
+  useEffect(() => {
+    const getAll = async () => {
+      const data = await service.getAll();
+      setBoats(data);
+    };
+    getAll();
+  }, []);
 
-export const PescaProvider = ({ children }: PescaProviderProps) => {
-  //lista de lanchas
-  //lista de viajes del as lacnhas
-  // selecciona un viaje y de este viaje se ve las pesca y los gastos de esta pesca
-  return <PescaContext.Provider value={{}}>{children}</PescaContext.Provider>;
+  const create = async (boat: BoatDto) => {
+    const data = await service.create(boat);
+    setBoats([...boats, data]);
+  };
+
+  const update = async (id: number, boat: BoatDto) => {
+    const data = await service.update(id, boat);
+    const index = boats.findIndex((b) => b.id === id);
+    boats[index] = data;
+  };
+
+  const remove = async (id: number) => {
+    await service.delete(id);
+    setBoats(boats.filter((b) => b.id !== id));
+  };
+
+  return (
+    <BoatContext.Provider
+      value={{
+        boats,
+        create,
+        update,
+        remove,
+      }}
+    >
+      {children}
+    </BoatContext.Provider>
+  );
 };

@@ -1,51 +1,38 @@
 import { ENV } from "../../core/constant/env";
-import axios from "axios";
+import axios, { Axios } from "axios";
 import { LoginDto } from "../domain/dto/login.dto";
 import { LoginResDto } from "../domain/dto/login.res.dto";
 
 export class AuthService {
   private apiUrl = ENV.API_URL;
-  async login({ code, password }: LoginDto): Promise<LoginResDto> {
-    const response = await axios.post(
-      `${this.apiUrl}/auth/login`,
-      {
-        code,
-        password,
+  private api: Axios;
+  constructor() {
+    this.api = axios.create({
+      baseURL: this.apiUrl,
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
       },
-      {
-        withCredentials: true,
-      }
-    );
+    });
+  }
+
+  async login({ code, password }: LoginDto): Promise<LoginResDto> {
+    const response = await this.api.post(`${this.apiUrl}/auth/login`, {
+      code,
+      password,
+    });
     const data: LoginResDto = response.data;
     data.status = response.status;
     return data;
   }
   async validateToken(): Promise<LoginResDto | null> {
-    const response = await axios.post(
-      `${this.apiUrl}/auth/validate-token`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      }
-    );
+    const response = await this.api.post(`${this.apiUrl}/auth/validate-token`);
     const data: LoginResDto = response.data;
     data.status = response.status;
     return data;
   }
 
   async logout(): Promise<void> {
-    await axios.post(
-      `${this.apiUrl}/auth/logout`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      }
-    );
+    await this.api.post(`${this.apiUrl}/auth/logout`);
   }
 }

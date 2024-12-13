@@ -4,12 +4,9 @@ import { AuthContext } from "./context";
 import { AuthService } from "../services/auth.service";
 import { LoginDto } from "../domain/dto/login.dto";
 import { useEffect } from "react";
+import { ContextProviderProps } from "../../shared/types/contextProviderProps";
 
-export interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: ContextProviderProps) => {
   const [userSession, setUserSession] = useState<UserSessionDto | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const authService = new AuthService();

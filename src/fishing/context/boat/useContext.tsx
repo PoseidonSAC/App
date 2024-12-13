@@ -1,9 +1,9 @@
-import { useContext } from "react";
-import { PescaContext } from "./context";
-export const usePesca = () => {
-  const context = useContext(PescaContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an PescaProvider");
-  }
-  return context;
+import { BoatContext } from "./context";
+import { useContextCustom } from "../../../shared/utils/useContextCustom";
+
+export const useBoat = () => {
+  return useContextCustom(
+    BoatContext,
+    "useBoat must be used within an BoatProvider"
+  );
 };

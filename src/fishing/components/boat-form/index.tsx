@@ -2,10 +2,7 @@ import zod from "zod";
 import { Card, TextField, Button, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { BoatDto } from "./../../domain/dto/boat.dto";
-import { type } from "./../../../auth/components/login-form/index";
 
 const schema = zod.object({
   name: zod.string(),
@@ -19,7 +16,7 @@ export interface BoatFormProps {
   type: "create" | "update";
 }
 
-export const BoatForm = ({ boat }: BoatFormProps) => {
+export const BoatForm = ({ boat, type }: BoatFormProps) => {
   const {
     register,
     handleSubmit,
@@ -34,11 +31,12 @@ export const BoatForm = ({ boat }: BoatFormProps) => {
       // await create(data);
 
       return;
-    } 
+    }
     if (type === "update") {
       // await update(data);
-      return ;
+      return;
     }
+  };
 
   return (
     <Box

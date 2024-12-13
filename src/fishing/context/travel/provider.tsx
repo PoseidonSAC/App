@@ -1,14 +1,51 @@
-import { useState } from "react";
-import { PescaContext } from "./context";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { TravelContext } from "./context";
+import { ContextProviderProps } from "./../../../shared/types/contextProviderProps";
+import { TravelService } from "../../services/travel.service";
+import { travelDto, travelResDto } from "./../../domain/dto/travel.dto";
 
-export interface PescaProviderProps {
-  children: React.ReactNode | React.ReactNode[];
-}
+export const TravelProvider = ({ children }: ContextProviderProps) => {
+  const service = new TravelService();
+  const [travelSelected, SetTravelSelected] = useState<travelResDto | null>(
+    null
+  );
+  const [travels, setTravels] = useState<travelResDto[]>([]);
+  useEffect(() => {
+    const getAll = async () => {
+      const data = await service.getAll();
+      setTravels(data);
+    };
+    getAll();
+  }, []);
 
-export const PescaProvider = ({ children }: PescaProviderProps) => {
-  //lista de lanchas
-  //lista de viajes del as lacnhas
-  // selecciona un viaje y de este viaje se ve las pesca y los gastos de esta pesca
-  return <PescaContext.Provider value={{}}>{children}</PescaContext.Provider>;
+  const create = async (travel: travelDto) => {
+    const data = await service.create(travel);
+    setTravels([...travels, data]);
+  };
+
+  const update = async (id: number, travel: travelDto) => {
+    const data = await service.update(id, travel);
+    const index = travels.findIndex((t) => t.id === id);
+    travels[index] = data;
+  };
+
+  const remove = async (id: number) => {
+    await service.delete(id);
+    setTravels(travels.filter((t) => t.id !== id));
+  };
+
+  return (
+    <TravelContext.Provider
+      value={{
+        travels,
+        create,
+        update,
+        remove,
+        travelSelected,
+        SetTravelSelected,
+      }}
+    >
+      {children}
+    </TravelContext.Provider>
+  );
 };

@@ -1,14 +1,57 @@
-import { useState } from "react";
-import { PescaContext } from "./context";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { OtherCostTravelContext } from "./context";
+import { ContextProviderProps } from "../../../shared/types/contextProviderProps";
+import { OtherCostTravelService } from "../../services/other_cost_travel.service";
+import {
+  OtherCostTravelDto,
+  OtherCostTravelResDto,
+} from "../../domain/dto/other_cost_travel.dto";
+import { useTravel } from "../travel";
 
-export interface PescaProviderProps {
-  children: React.ReactNode | React.ReactNode[];
-}
+export const OtherCostTravelProvider = ({ children }: ContextProviderProps) => {
+  const [otherCostTravels, setOtherCostTravels] = useState<
+    OtherCostTravelResDto[]
+  >([]);
+  const service = new OtherCostTravelService();
+  const { travelSelected } = useTravel();
 
-export const PescaProvider = ({ children }: PescaProviderProps) => {
-  //lista de lanchas
-  //lista de viajes del as lacnhas
-  // selecciona un viaje y de este viaje se ve las pesca y los gastos de esta pesca
-  return <PescaContext.Provider value={{}}>{children}</PescaContext.Provider>;
+  useEffect(() => {
+    const getAll = async () => {
+      if (!travelSelected) return;
+      const data = await service.getOtherCostTravelByTravelId(
+        travelSelected.id
+      );
+      setOtherCostTravels(data);
+    };
+    getAll();
+  }, [travelSelected]);
+
+  const create = async (otherCost: OtherCostTravelDto) => {
+    const data = await service.create(otherCost);
+    setOtherCostTravels([...otherCostTravels, data]);
+  };
+
+  const update = async (id: number, otherCost: OtherCostTravelDto) => {
+    const data = await service.update(id, otherCost);
+    const index = otherCostTravels.findIndex((o) => o.id === id);
+    otherCostTravels[index] = data;
+  };
+
+  const remove = async (id: number) => {
+    await service.delete(id);
+    setOtherCostTravels(otherCostTravels.filter((o) => o.id !== id));
+  };
+
+  return (
+    <OtherCostTravelContext.Provider
+      value={{
+        otherCostTravels,
+        create,
+        update,
+        remove,
+      }}
+    >
+      {children}
+    </OtherCostTravelContext.Provider>
+  );
 };

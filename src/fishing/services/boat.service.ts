@@ -1,32 +1,30 @@
-import { ENV } from "../../core/constant/env";
-import axios from "axios";
+import { api } from "../../core/api";
 import { BoatDto } from "./../domain/dto/boat.dto";
 
 export class BoatService {
-  private apiURL = ENV.API_URL + "/boat";
-
+  private apiUrl = "/fishing/boat";
   async getAll() {
-    const response = await axios.get(this.apiURL);
+    const response = await api.get(this.apiUrl);
     return response.data;
   }
 
   async getById(id: number) {
-    const response = await axios.get(`${this.apiURL}/${id}`);
+    const response = await api.get(`${this.apiUrl}/${id}`);
     return response.data;
   }
 
   async create(data: BoatDto) {
-    const response = await axios.post(this.apiURL, data);
+    const response = await api.post(this.apiUrl, data);
     return response.data;
   }
 
   async update(id: number, data: BoatDto) {
-    const response = await axios.put(`${this.apiURL}/${id}`, data);
+    const response = await api.put(`${this.apiUrl}/${id}`, data);
     return response.data;
   }
 
   async delete(id: number) {
-    const response = await axios.delete(`${this.apiURL}/${id}`);
+    const response = await api.delete(`${this.apiUrl}/${id}`);
     return response.data;
   }
 }

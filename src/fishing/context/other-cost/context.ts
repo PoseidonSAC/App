@@ -1,5 +1,13 @@
 import { createContext } from "react";
 
-export interface PescaContextProps {}
+import { OtherCostTravelResDto } from "../../domain/dto/other_cost_travel.dto";
 
-export const PescaContext = createContext<PescaContextProps | null>(null);
+export interface OtherCostTravelContextProps {
+  otherCostTravels: OtherCostTravelResDto[];
+  create: (otherCostTravel: OtherCostTravelResDto) => void;
+  update: (id: number, otherCostTravel: OtherCostTravelResDto) => void;
+  remove: (id: number) => void;
+}
+
+export const OtherCostTravelContext =
+  createContext<OtherCostTravelContextProps | null>(null);

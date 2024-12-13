@@ -1,14 +1,49 @@
-import { useState } from "react";
-import { PescaContext } from "./context";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { FishingContext } from "./context";
+import { ContextProviderProps } from "../../../shared/types/contextProviderProps";
+import { FishingDto, FishingResDto } from "./../../domain/dto/fishing.dto";
+import { FishingService } from "../../services/fishing.service";
+import { useTravel } from "../travel";
 
-export interface PescaProviderProps {
-  children: React.ReactNode | React.ReactNode[];
-}
+export const FishingProvider = ({ children }: ContextProviderProps) => {
+  const { travelSelected } = useTravel();
+  const service = new FishingService();
+  const [fishings, setFishings] = useState<FishingResDto[]>([]);
+  useEffect(() => {
+    const getAll = async () => {
+      if (!travelSelected) return;
+      const data = await service.getFishingByTravelId(travelSelected.id);
+      setFishings(data);
+    };
+    getAll();
+  }, [travelSelected]);
 
-export const PescaProvider = ({ children }: PescaProviderProps) => {
-  //lista de lanchas
-  //lista de viajes del as lacnhas
-  // selecciona un viaje y de este viaje se ve las pesca y los gastos de esta pesca
-  return <PescaContext.Provider value={{}}>{children}</PescaContext.Provider>;
+  const create = async (fishing: FishingDto) => {
+    const data = await service.create(fishing);
+    setFishings([...fishings, data]);
+  };
+
+  const update = async (id: number, fishing: FishingDto) => {
+    const data = await service.update(id, fishing);
+    const index = fishings.findIndex((f) => f.id === id);
+    fishings[index] = data;
+  };
+
+  const remove = async (id: number) => {
+    await service.delete(id);
+    setFishings(fishings.filter((f) => f.id !== id));
+  };
+
+  return (
+    <FishingContext.Provider
+      value={{
+        fishings,
+        create,
+        update,
+        remove,
+      }}
+    >
+      {children}
+    </FishingContext.Provider>
+  );
 };
