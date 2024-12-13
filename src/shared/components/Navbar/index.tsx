@@ -7,7 +7,7 @@ export interface NavbarProps {
   items: Item[] | null;
 }
 
-export const Navbar = ({ items }: NavbarProps) => {
+export const Navbar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   return (
@@ -16,7 +16,7 @@ export const Navbar = ({ items }: NavbarProps) => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           JUANY S.A.C
         </Typography>
-        {items &&
+        {/*items &&
           items.map((item, index) => (
             <Button
               key={index}
@@ -25,7 +25,7 @@ export const Navbar = ({ items }: NavbarProps) => {
             >
               {item.title}
             </Button>
-          ))}
+          ))*/}
         <Button color="inherit" onClick={() => navigate("/inicio")}>
           Inicio
         </Button>
