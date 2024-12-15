@@ -31,7 +31,7 @@ export const Login = () => {
       >
         <Box sx={{ textAlign: "center" }}>
           <img
-            src="src/assets/logo.jpg"
+            src="logo.jpg"
             alt="Company Logo"
             style={{ maxWidth: "25%", height: "auto", borderRadius: "25%" }}
           />
