@@ -1,7 +1,7 @@
 import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import { Box } from "@mui/system";
 
-import { Item } from "../../../navbarItems/types/Item/index";
+import { Item } from "./../../navbarItems/types/Item/index";
 
 export interface DrawerProps {
   items: Item[];

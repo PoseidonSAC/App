@@ -1,7 +1,4 @@
-import { useState } from "react";
 import { PescaContext } from "./context";
-import { useEffect } from "react";
-
 export interface PescaProviderProps {
   children: React.ReactNode | React.ReactNode[];
 }
