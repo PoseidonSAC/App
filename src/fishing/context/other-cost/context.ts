@@ -1,12 +1,15 @@
 import { createContext } from "react";
 
-import { OtherCostTravelResDto } from "../../domain/dto/other_cost_travel.dto";
+import {
+  OtherCostTravelResDto,
+  OtherCostTravelDto,
+} from "../../domain/dto/other_cost_travel.dto";
 
 export interface OtherCostTravelContextProps {
   otherCostTravels: OtherCostTravelResDto[];
-  create: (otherCostTravel: OtherCostTravelResDto) => void;
-  update: (id: number, otherCostTravel: OtherCostTravelResDto) => void;
-  remove: (id: number) => void;
+  create: (otherCostTravel: OtherCostTravelDto) => Promise<void>;
+  update: (id: number, otherCostTravel: OtherCostTravelDto) => Promise<void>;
+  remove: (id: number) => Promise<void>;
 }
 
 export const OtherCostTravelContext =

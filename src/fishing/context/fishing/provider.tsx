@@ -19,19 +19,21 @@ export const FishingProvider = ({ children }: ContextProviderProps) => {
   }, [travelSelected]);
 
   const create = async (fishing: FishingDto) => {
+    fishing.id_travel = travelSelected?.id as number;
     const data = await service.create(fishing);
     setFishings([...fishings, data]);
   };
 
   const update = async (id: number, fishing: FishingDto) => {
-    const data = await service.update(id, fishing);
-    const index = fishings.findIndex((f) => f.id === id);
-    fishings[index] = data;
+    await service.update(id, fishing);
+    setFishings((prev) =>
+      prev.map((f) => (f.id === id ? { ...f, ...fishing } : f))
+    );
   };
 
   const remove = async (id: number) => {
     await service.delete(id);
-    setFishings(fishings.filter((f) => f.id !== id));
+    setFishings((prev) => prev.filter((f) => f.id !== id));
   };
 
   return (

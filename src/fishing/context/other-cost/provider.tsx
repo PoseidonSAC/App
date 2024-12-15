@@ -27,14 +27,16 @@ export const OtherCostTravelProvider = ({ children }: ContextProviderProps) => {
   }, [travelSelected]);
 
   const create = async (otherCost: OtherCostTravelDto) => {
+    otherCost.id_travel = travelSelected?.id as number;
     const data = await service.create(otherCost);
     setOtherCostTravels([...otherCostTravels, data]);
   };
 
   const update = async (id: number, otherCost: OtherCostTravelDto) => {
-    const data = await service.update(id, otherCost);
-    const index = otherCostTravels.findIndex((o) => o.id === id);
-    otherCostTravels[index] = data;
+    await service.update(id, otherCost);
+    setOtherCostTravels((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, ...otherCost } : o))
+    );
   };
 
   const remove = async (id: number) => {

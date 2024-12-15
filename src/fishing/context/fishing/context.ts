@@ -3,7 +3,7 @@ import { FishingResDto, FishingDto } from "../../domain/dto/fishing.dto";
 
 export interface FishingContextProps {
   fishings: FishingResDto[];
-  create: (fishing: FishingResDto) => void;
+  create: (fishing: FishingDto) => void;
   update: (id: number, fishing: FishingDto) => void;
   remove: (id: number) => void;
 }
