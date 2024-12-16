@@ -437,6 +437,7 @@ const FishingTravel = () => {
 const TravelResume = () => {
   const { travelSelected } = useTravel();
   const { fishings } = useFishing();
+  const { otherCostTravels } = useOtherCost();
 
   if (!travelSelected) {
     return (
@@ -453,6 +454,16 @@ const TravelResume = () => {
     (travelSelected?.gas_cylinder_cost || 0) +
     (travelSelected?.oil_consume_price || 0) +
     (travelSelected?.provisions_cost || 0);
+
+  const total_boxes = fishings.reduce((acc, fishing) => acc + fishing.boxes, 0);
+  const total_tons =
+    fishings.reduce((acc, fishing) => acc + fishing.weight * fishing.boxes, 0) /
+    1000;
+
+  const total_other_cost = otherCostTravels.reduce(
+    (acc, otherCost) => acc + otherCost.price,
+    0
+  );
 
   return (
     <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
@@ -476,11 +487,26 @@ const TravelResume = () => {
             <TableCell>{totalCost}</TableCell>
           </TableRow>
           <TableRow>
+            <TableCell>Otros costos</TableCell>
+            <TableCell>{total_other_cost}</TableCell>
+          </TableRow>
+
+          <TableRow>
+            <TableCell>Numero Cajas</TableCell>
+            <TableCell>{total_boxes}</TableCell>
+          </TableRow>
+
+          <TableRow>
+            <TableCell>Total Toneladas</TableCell>
+            <TableCell>{total_tons}</TableCell>
+          </TableRow>
+
+          <TableRow>
             <TableCell>Total</TableCell>
             <TableCell>{totalFishing - totalCost}</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell>Total Div</TableCell>
+            <TableCell>Total Dividido</TableCell>
             <TableCell>{(totalFishing - totalCost) / 2}</TableCell>
           </TableRow>
         </TableBody>
