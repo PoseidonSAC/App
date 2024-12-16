@@ -57,7 +57,7 @@ export const TravelCreateForm = () => {
           fullWidth
           label="Petroleo Cargado"
           type="number"
-          {...(register("oil_charge"), { valueAsNumber: true })}
+          {...(register("oil_charge", { valueAsNumber: true }))}
           error={!!errors.oil_charge}
           helperText={errors.code ? "Petroleo Cargado es requerido" : ""}
         />
@@ -65,7 +65,7 @@ export const TravelCreateForm = () => {
           fullWidth
           label="Costo"
           type="number"
-          {...(register("oil_charger_price"), { valueAsNumber: true })}
+          {...(register("oil_charger_price", { valueAsNumber: true }))}
           error={!!errors.oil_charger_price}
           helperText={errors.code ? "Costo es requerido" : ""}
         />
@@ -76,7 +76,7 @@ export const TravelCreateForm = () => {
           fullWidth
           label="Petroleo Consumido"
           type="number"
-          {...(register("oil_consume"), { valueAsNumber: true })}
+          {...(register("oil_consume", { valueAsNumber: true }))}
           error={!!errors.oil_consume}
           helperText={errors.code ? "Petroleo Consumido es requerido" : ""}
         />
@@ -84,7 +84,7 @@ export const TravelCreateForm = () => {
           fullWidth
           label="Costo"
           type="number"
-          {...(register("oil_consume_price"), { valueAsNumber: true })}
+          {...(register("oil_consume_price", { valueAsNumber: true }))}
           error={!!errors.oil_consume_price}
           helperText={errors.code ? "Costo es requerido" : ""}
         />
@@ -95,7 +95,7 @@ export const TravelCreateForm = () => {
           fullWidth
           label="Provicisiones"
           type="number"
-          {...(register("provisions_cost"), { valueAsNumber: true })}
+          {...(register("provisions_cost", { valueAsNumber: true }))}
           error={!!errors.provisions_cost}
           helperText={errors.code ? "Proviciones es requerido" : ""}
         />
@@ -105,7 +105,7 @@ export const TravelCreateForm = () => {
         <TextField
           fullWidth
           label="Balon de Gas"
-          {...(register("gas_cylinder_cost"), { valueAsNumber: true })}
+          {...(register("gas_cylinder_cost", { valueAsNumber: true }))}
           error={!!errors.gas_cylinder_cost}
           helperText={errors.code ? "Balon de Gas es requerido" : ""}
         />
