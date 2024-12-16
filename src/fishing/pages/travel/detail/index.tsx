@@ -82,11 +82,7 @@ export const TravelDetail = () => {
         Detalle del viaje
       </Typography>
 
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        sx={{ display: "flex", flexDirection: "column", gap: 1 }}
-      >
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <TextField
           label="Gasto total"
           value={totalCost}
@@ -176,7 +172,11 @@ export const TravelDetail = () => {
         />
 
         {isEditing ? (
-          <Button variant="contained" sx={{ marginTop: 2 }} type="submit">
+          <Button
+            variant="contained"
+            sx={{ marginTop: 2 }}
+            onClick={handleSubmit(onSubmit)}
+          >
             Guardar
           </Button>
         ) : (
