@@ -87,7 +87,6 @@ export const TravelDetail = () => {
           label="Gasto total"
           value={totalCost}
           InputProps={{
-            readOnly: true,
             style: { color: "black", fontWeight: "bold" },
           }}
           disabled
@@ -96,7 +95,6 @@ export const TravelDetail = () => {
           {...register("code")}
           label="Código"
           InputProps={{
-            readOnly: true,
             style: { color: "black", fontWeight: "bold" },
           }}
           disabled={!isEditing}
@@ -106,7 +104,6 @@ export const TravelDetail = () => {
           label="Carga de Petróleo"
           type="number"
           InputProps={{
-            readOnly: true,
             style: { color: "black", fontWeight: "bold" },
           }}
           disabled={!isEditing}
@@ -116,7 +113,6 @@ export const TravelDetail = () => {
           label="Precio de carga de Petróleo"
           type="number"
           InputProps={{
-            readOnly: true,
             style: { color: "black", fontWeight: "bold" },
           }}
           disabled={!isEditing}
@@ -126,7 +122,6 @@ export const TravelDetail = () => {
           label="Consumo de Petróleo"
           type="number"
           InputProps={{
-            readOnly: true,
             style: { color: "black", fontWeight: "bold" },
           }}
           disabled={!isEditing}
@@ -136,7 +131,6 @@ export const TravelDetail = () => {
           label="Precio de consumo de Petróleo"
           type="number"
           InputProps={{
-            readOnly: true,
             style: { color: "black", fontWeight: "bold" },
           }}
           disabled={!isEditing}
@@ -146,7 +140,6 @@ export const TravelDetail = () => {
           label="Costo de provisiones"
           type="number"
           InputProps={{
-            readOnly: true,
             style: { color: "black", fontWeight: "bold" },
           }}
           disabled={!isEditing}
@@ -156,7 +149,6 @@ export const TravelDetail = () => {
           label="Costo de cilindro de gas"
           type="number"
           InputProps={{
-            readOnly: true,
             style: { color: "black", fontWeight: "bold" },
           }}
           disabled={!isEditing}
@@ -165,7 +157,6 @@ export const TravelDetail = () => {
           label="Asignado"
           value={travelSelected.assigned ? "Si" : "No"}
           InputProps={{
-            readOnly: true,
             style: { color: "black", fontWeight: "bold" },
           }}
           disabled
