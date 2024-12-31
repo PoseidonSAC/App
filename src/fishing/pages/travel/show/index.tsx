@@ -18,7 +18,7 @@ export const TravelCreateModal = () => {
         <Box
           sx={{
             padding: 2,
-            maxWidth: 400,
+            maxWidth: 1000,
             borderRadius: 2,
             backgroundColor: "background.paper",
             display: "flex",
@@ -26,9 +26,10 @@ export const TravelCreateModal = () => {
             justifyContent: "center",
             alignItems: "center",
             border: "none",
-            position: "float",
+            position: "absolute",
             top: "50%",
             left: "50%",
+            transform: "translate(-50%, -50%)",
           }}
         >
           <Typography variant="h5" component="h1" gutterBottom>

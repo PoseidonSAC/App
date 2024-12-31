@@ -1,4 +1,5 @@
-import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { Box, Card, TextField, Button } from "@mui/material";
 import { useTravel } from "./../../../context/travel/useContext";
 import { travelDto } from "./../../../domain/dto/travel.dto";
@@ -18,6 +19,9 @@ export const TravelCreateForm = () => {
   const {
     register,
     handleSubmit,
+    control,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<travelDto>({
     defaultValues,
@@ -26,20 +30,32 @@ export const TravelCreateForm = () => {
   const onSubmit = async (data: travelDto) => {
     await create(data);
   };
+
+  const oilCharge = watch("oil_charge");
+  const oilConsume = watch("oil_consume");
+  const defaultPricePerUnit = 680;
+
+  useEffect(() => {
+    setValue("oil_charger_price", oilCharge * defaultPricePerUnit);
+  }, [oilCharge, setValue]);
+
+  useEffect(() => {
+    setValue("oil_consume_price", oilConsume * defaultPricePerUnit);
+  }, [oilConsume, setValue]);
+
   return (
     <Box
       component={"form"}
       onSubmit={handleSubmit(onSubmit)}
       sx={{
-        maxWidth: 400,
         padding: 3,
-        boxShadow: 3,
-        borderRadius: 2,
         backgroundColor: "background.paper",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+        overflowY: "auto",
+        maxHeight: "80vh",
       }}
     >
       <Card sx={{ width: "100%", padding: 2, boxShadow: 0 }}>
@@ -52,64 +68,99 @@ export const TravelCreateForm = () => {
         />
       </Card>
 
-      <Card sx={{ width: "100%", padding: 2, boxShadow: 0 }}>
-        <TextField
-          fullWidth
-          label="Petroleo Cargado"
-          type="number"
-          {...(register("oil_charge", { valueAsNumber: true }))}
-          error={!!errors.oil_charge}
-          helperText={errors.code ? "Petroleo Cargado es requerido" : ""}
-        />
-        <TextField
-          fullWidth
-          label="Costo"
-          type="number"
-          {...(register("oil_charger_price", { valueAsNumber: true }))}
-          error={!!errors.oil_charger_price}
-          helperText={errors.code ? "Costo es requerido" : ""}
-        />
-      </Card>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: 2,
+          width: "100%",
+        }}
+      >
+        <Card sx={{ flex: 1, padding: 2, boxShadow: 0 }}>
+          <TextField
+            fullWidth
+            label="Petroleo Cargado"
+            type="number"
+            {...register("oil_charge", { valueAsNumber: true })}
+            error={!!errors.oil_charge}
+            helperText={
+              errors.oil_charge ? "Petroleo Cargado es requerido" : ""
+            }
+          />
+          <Controller
+            name="oil_charger_price"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                fullWidth
+                label="Costo"
+                type="number"
+                {...field}
+                error={!!errors.oil_charger_price}
+                helperText={
+                  errors.oil_charger_price ? "Costo es requerido" : ""
+                }
+              />
+            )}
+          />
+        </Card>
 
-      <Card sx={{ width: "100%", padding: 2, boxShadow: 0 }}>
-        <TextField
-          fullWidth
-          label="Petroleo Consumido"
-          type="number"
-          {...(register("oil_consume", { valueAsNumber: true }))}
-          error={!!errors.oil_consume}
-          helperText={errors.code ? "Petroleo Consumido es requerido" : ""}
-        />
-        <TextField
-          fullWidth
-          label="Costo"
-          type="number"
-          {...(register("oil_consume_price", { valueAsNumber: true }))}
-          error={!!errors.oil_consume_price}
-          helperText={errors.code ? "Costo es requerido" : ""}
-        />
-      </Card>
+        <Card sx={{ flex: 1, padding: 2, boxShadow: 0 }}>
+          <TextField
+            fullWidth
+            label="Petroleo Consumido"
+            type="number"
+            {...register("oil_consume", { valueAsNumber: true })}
+            error={!!errors.oil_consume}
+            helperText={
+              errors.oil_consume ? "Petroleo Consumido es requerido" : ""
+            }
+          />
+          <Controller
+            name="oil_consume_price"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                fullWidth
+                label="Costo"
+                type="number"
+                {...field}
+                error={!!errors.oil_consume_price}
+                helperText={
+                  errors.oil_consume_price ? "Costo es requerido" : ""
+                }
+              />
+            )}
+          />
+        </Card>
 
-      <Card sx={{ width: "100%", padding: 2, boxShadow: 0 }}>
-        <TextField
-          fullWidth
-          label="Provicisiones"
-          type="number"
-          {...(register("provisions_cost", { valueAsNumber: true }))}
-          error={!!errors.provisions_cost}
-          helperText={errors.code ? "Proviciones es requerido" : ""}
-        />
-      </Card>
+        <Card sx={{ flex: 1, padding: 2, boxShadow: 0 }}>
+          <TextField
+            fullWidth
+            label="Proviciones"
+            type="number"
+            {...register("provisions_cost", { valueAsNumber: true })}
+            error={!!errors.provisions_cost}
+            helperText={
+              errors.provisions_cost ? "Proviciones es requerido" : ""
+            }
+          />
+        </Card>
 
-      <Card sx={{ width: "100%", padding: 2, boxShadow: 0 }}>
-        <TextField
-          fullWidth
-          label="Balon de Gas"
-          {...(register("gas_cylinder_cost", { valueAsNumber: true }))}
-          error={!!errors.gas_cylinder_cost}
-          helperText={errors.code ? "Balon de Gas es requerido" : ""}
-        />
-      </Card>
+        <Card sx={{ flex: 1, padding: 2, boxShadow: 0 }}>
+          <TextField
+            fullWidth
+            label="Balon de Gas"
+            type="number"
+            {...register("gas_cylinder_cost", { valueAsNumber: true })}
+            error={!!errors.gas_cylinder_cost}
+            helperText={
+              errors.gas_cylinder_cost ? "Balon de Gas es requerido" : ""
+            }
+          />
+        </Card>
+      </Box>
       <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
         Registrar
       </Button>
