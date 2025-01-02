@@ -7,7 +7,7 @@ export interface TravelContextProps {
   update: (id: number, travel: travelDto) => Promise<void>;
   remove: (id: number) => Promise<void>;
   travelSelected: travelResDto | null;
-  SetTravelSelected: (travel: travelResDto) => void;
+  SetTravelSelected: (travel: travelResDto | null) => void;
 }
 
 export const TravelContext = createContext<TravelContextProps | null>(null);

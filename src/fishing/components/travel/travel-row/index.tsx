@@ -3,7 +3,7 @@ import { travelResDto } from "./../../../domain/dto/travel.dto";
 export interface TravelRowProps {
   travel: travelResDto;
   goToDetail: (travel: travelResDto) => void;
-  dateFormater: (date: Date) => string;
+  dateFormater: (date: string) => string;
 }
 
 export const TravelRow = ({
@@ -26,9 +26,6 @@ export const TravelRow = ({
       </TableCell>
       <TableCell component={"th"} scope="row">
         {dateFormater(travel.createdAt)}
-      </TableCell>
-      <TableCell component={"th"} scope="row">
-        {travel.assigned ? "Asignada Carga" : "No asignado Carga"}
       </TableCell>
     </TableRow>
   );

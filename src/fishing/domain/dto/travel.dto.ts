@@ -6,7 +6,7 @@ export interface travelDto {
   oil_consume_price: number;
   provisions_cost: number;
   gas_cylinder_cost: number;
-  assigned: boolean;
+  createdAt: string;
 }
 
 export interface travelResDto {
@@ -18,7 +18,6 @@ export interface travelResDto {
   provisions_cost: number;
   gas_cylinder_cost: number;
   id: number;
-  createdAt: Date;
-  updatedAt: Date;
-  assigned: boolean;
+  createdAt: string;
+  updatedAt: string;
 }

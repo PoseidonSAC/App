@@ -5,8 +5,8 @@ import { TravelTableHead } from "../travel-table-head";
 
 import { travelResDto } from "../../../domain/dto/travel.dto";
 import { useNavigate } from "react-router-dom";
-import moment from "moment";
 import { useTravel } from "./../../../context/travel/useContext";
+import { format } from "date-fns";
 
 export interface TravelTableProps {
   travels: travelResDto[];
@@ -19,7 +19,9 @@ export const TravelTable = ({ travels }: TravelTableProps) => {
     SetTravelSelected(travel);
     navigate(`/pesca/viaje/${travel.id}`);
   };
-  const dateFormater = (date: Date) => moment(date).format("DD/MM/YYYY");
+  const dateFormater = (date: string) => {
+    return format(date.slice(0, -1), "dd/MM/yyyy");
+  };
   return (
     <TableContainer>
       <Table>

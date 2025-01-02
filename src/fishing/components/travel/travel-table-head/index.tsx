@@ -6,7 +6,6 @@ export const TravelTableHead = () => {
       <TableRow>
         <TableCell>Codigo</TableCell>
         <TableCell>Creado</TableCell>
-        <TableCell>Asignado</TableCell>
       </TableRow>
     </TableHead>
   );

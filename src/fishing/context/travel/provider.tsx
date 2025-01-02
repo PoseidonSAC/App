@@ -10,17 +10,26 @@ export const TravelProvider = ({ children }: ContextProviderProps) => {
     null
   );
   const [travels, setTravels] = useState<travelResDto[]>([]);
+  const sortTravels = (data: travelResDto[]) => {
+    data.sort((a: travelResDto, b: travelResDto) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+    return data;
+  };
+
   useEffect(() => {
     const getAll = async () => {
       const data = await service.getAll();
-      setTravels(data);
+      const sortedData = sortTravels(data);
+      setTravels(sortedData);
     };
     getAll();
   }, []);
 
   const create = async (travel: travelDto) => {
     const data = await service.create(travel);
-    setTravels([...travels, data]);
+
+    setTravels(sortTravels([...travels, data]));
   };
 
   const update = async (id: number, travel: travelDto) => {

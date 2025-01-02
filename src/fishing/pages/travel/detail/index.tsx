@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { format, parseISO } from "date-fns";
+
 import { useTravel } from "../../../context/travel/useContext";
 import {
   Card,
@@ -11,8 +13,9 @@ import {
   TableRow,
   TableCell,
   TableHead,
+  Modal,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { travelDto } from "./../../../domain/dto/travel.dto";
 import { useOtherCost } from "./../../../context/other-cost/useContext";
 import { useFishing } from "./../../../context/fishing/useContext";
@@ -22,10 +25,25 @@ import {
 } from "../../../domain/dto/other_cost_travel.dto";
 
 import { FishingDto, FishingResDto } from "./../../../domain/dto/fishing.dto";
+import { useNavigate } from "react-router-dom";
 
 export const TravelDetailPage = () => {
+  const [open, setOpen] = useState(false);
+
   return (
     <>
+      <Box sx={{ display: "flex", justifyContent: "end", p: 2 }}>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={() => {
+            setOpen(true);
+          }}
+        >
+          Eliminar
+        </Button>
+      </Box>
+      <DeleteModal open={open} onClose={() => setOpen(false)} />
       <TravelDetail />
       <TravelResume />
       <OtherCostTravel />
@@ -34,12 +52,54 @@ export const TravelDetailPage = () => {
   );
 };
 
+interface DeleteModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+const DeleteModal = ({ open, onClose }: DeleteModalProps) => {
+  const { travelSelected, remove, SetTravelSelected } = useTravel();
+  const navigate = useNavigate();
+
+  const handleDelete = () => {
+    if (travelSelected) {
+      remove(travelSelected.id);
+      SetTravelSelected(null);
+      navigate("/pesca");
+    }
+  };
+
+  return (
+    <Modal open={open} onClose={onClose}>
+      <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
+        <Typography variant="h6" component="h1" gutterBottom>
+          ¿Estás seguro de eliminar el viaje?
+        </Typography>
+        <Button variant="contained" color="error" onClick={handleDelete}>
+          Eliminar
+        </Button>
+        <Button variant="contained" color="secondary" onClick={onClose}>
+          Cancelar
+        </Button>
+      </Card>
+    </Modal>
+  );
+};
+
 export const TravelDetail = () => {
   const { travelSelected, update } = useTravel();
   const [isEditing, setIsEditing] = useState(false);
   const [totalCost, setTotalCost] = useState(0);
 
-  const { register, handleSubmit, reset } = useForm({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    control,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       code: "",
       oil_charge: 0,
@@ -48,13 +108,37 @@ export const TravelDetail = () => {
       oil_consume_price: 0,
       provisions_cost: 0,
       gas_cylinder_cost: 0,
-      assigned: false,
+      createdAt: "",
     },
   });
 
+  const formatToInputDate = (isoDate: string): string =>
+    format(parseISO(isoDate.slice(0, -1)), "yyyy-MM-dd");
+
+  const formatToISODate = (date: string): string =>
+    new Date(date).toISOString();
+
+  const oilCharge = watch("oil_charge");
+  const oilConsume = watch("oil_consume");
+  const defaultPricePerUnit = 680;
+
+  useEffect(() => {
+    setValue("oil_charger_price", oilCharge * defaultPricePerUnit);
+  }, [oilCharge, setValue]);
+
+  useEffect(() => {
+    setValue("oil_consume_price", oilConsume * defaultPricePerUnit);
+  }, [oilConsume, setValue]);
+
   useEffect(() => {
     if (travelSelected) {
-      reset(travelSelected);
+      const formattedData = {
+        ...travelSelected,
+        createdAt: travelSelected.createdAt
+          ? formatToInputDate(travelSelected.createdAt)
+          : "",
+      };
+      reset(formattedData);
       setTotalCost(
         travelSelected.oil_consume_price +
           travelSelected.provisions_cost +
@@ -65,7 +149,10 @@ export const TravelDetail = () => {
 
   const onSubmit = (data: travelDto) => {
     if (travelSelected) {
-      update(travelSelected.id, data);
+      update(travelSelected.id, {
+        ...data,
+        createdAt: formatToISODate(data.createdAt),
+      });
       setIsEditing(false);
     }
   };
@@ -84,7 +171,7 @@ export const TravelDetail = () => {
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <TextField
-          label="Gasto total"
+          label="Gasto de Viaje"
           value={totalCost}
           InputProps={{
             style: { color: "black", fontWeight: "bold" },
@@ -100,6 +187,15 @@ export const TravelDetail = () => {
           disabled={!isEditing}
         />
         <TextField
+          {...register("createdAt", { valueAsDate: true })}
+          label="Fecha"
+          type="date"
+          InputProps={{
+            style: { color: "black", fontWeight: "bold" },
+          }}
+          disabled={!isEditing}
+        />
+        <TextField
           {...register("oil_charge", { valueAsNumber: true })}
           label="Carga de Petróleo"
           type="number"
@@ -108,14 +204,24 @@ export const TravelDetail = () => {
           }}
           disabled={!isEditing}
         />
-        <TextField
-          {...register("oil_charger_price", { valueAsNumber: true })}
-          label="Precio de carga de Petróleo"
-          type="number"
-          InputProps={{
-            style: { color: "black", fontWeight: "bold" },
-          }}
-          disabled={!isEditing}
+
+        <Controller
+          name="oil_charger_price"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              fullWidth
+              label="Gastos de carga de Petróleo"
+              type="number"
+              {...field}
+              error={!!errors.oil_charger_price}
+              helperText={errors.oil_charger_price ? "Costo es requerido" : ""}
+              InputProps={{
+                style: { color: "black", fontWeight: "bold" },
+              }}
+              disabled={!isEditing}
+            />
+          )}
         />
         <TextField
           {...register("oil_consume", { valueAsNumber: true })}
@@ -126,18 +232,29 @@ export const TravelDetail = () => {
           }}
           disabled={!isEditing}
         />
-        <TextField
-          {...register("oil_consume_price", { valueAsNumber: true })}
-          label="Precio de consumo de Petróleo"
-          type="number"
-          InputProps={{
-            style: { color: "black", fontWeight: "bold" },
-          }}
-          disabled={!isEditing}
+
+        <Controller
+          name="oil_consume_price"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              fullWidth
+              label="Gastos de carga de Petróleo"
+              type="number"
+              {...field}
+              error={!!errors.oil_consume_price}
+              helperText={errors.oil_consume_price ? "Costo es requerido" : ""}
+              InputProps={{
+                style: { color: "black", fontWeight: "bold" },
+              }}
+              disabled={!isEditing}
+            />
+          )}
         />
+
         <TextField
           {...register("provisions_cost", { valueAsNumber: true })}
-          label="Costo de provisiones"
+          label="Viveres"
           type="number"
           InputProps={{
             style: { color: "black", fontWeight: "bold" },
@@ -146,20 +263,12 @@ export const TravelDetail = () => {
         />
         <TextField
           {...register("gas_cylinder_cost", { valueAsNumber: true })}
-          label="Costo de cilindro de gas"
+          label="Balon de Gas"
           type="number"
           InputProps={{
             style: { color: "black", fontWeight: "bold" },
           }}
           disabled={!isEditing}
-        />
-        <TextField
-          label="Asignado"
-          value={travelSelected.assigned ? "Si" : "No"}
-          InputProps={{
-            style: { color: "black", fontWeight: "bold" },
-          }}
-          disabled
         />
 
         {isEditing ? (
@@ -470,15 +579,15 @@ const TravelResume = () => {
         </TableHead>
         <TableBody>
           <TableRow>
-            <TableCell>Pesca</TableCell>
+            <TableCell>Efectivo de Pesca</TableCell>
             <TableCell>{totalFishing}</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell>Costos de viaje</TableCell>
+            <TableCell>Gasto de viaje</TableCell>
             <TableCell>{totalCost}</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell>Otros costos</TableCell>
+            <TableCell>Otros Gastos</TableCell>
             <TableCell>{total_other_cost}</TableCell>
           </TableRow>
 
@@ -493,11 +602,11 @@ const TravelResume = () => {
           </TableRow>
 
           <TableRow>
-            <TableCell>Total</TableCell>
+            <TableCell>Total Liquido</TableCell>
             <TableCell>{totalFishing - totalCost}</TableCell>
           </TableRow>
           <TableRow>
-            <TableCell>Total Dividido</TableCell>
+            <TableCell>Repartición</TableCell>
             <TableCell>{(totalFishing - totalCost) / 2}</TableCell>
           </TableRow>
         </TableBody>

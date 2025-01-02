@@ -35,7 +35,7 @@ export const TravelCreateModal = () => {
           <Typography variant="h5" component="h1" gutterBottom>
             Nuevo Viaje Lancha
           </Typography>
-          <TravelCreateForm />
+          <TravelCreateForm close={handleClose} />
         </Box>
       </Modal>
     </>

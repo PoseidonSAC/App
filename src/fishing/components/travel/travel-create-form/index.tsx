@@ -12,10 +12,14 @@ const defaultValues: travelDto = {
   oil_consume_price: 0,
   provisions_cost: 0,
   gas_cylinder_cost: 0,
-  assigned: false,
+  createdAt: "",
 };
 
-export const TravelCreateForm = () => {
+export interface TravelCreateFormProps {
+  close: () => void;
+}
+
+export const TravelCreateForm = ({ close }: TravelCreateFormProps) => {
   const {
     register,
     handleSubmit,
@@ -27,8 +31,11 @@ export const TravelCreateForm = () => {
     defaultValues,
   });
   const { create } = useTravel();
+  const formatToISODate = (date: string): string =>
+    new Date(date).toISOString();
   const onSubmit = async (data: travelDto) => {
-    await create(data);
+    await create({ ...data, createdAt: formatToISODate(data.createdAt) });
+    close();
   };
 
   const oilCharge = watch("oil_charge");
@@ -58,13 +65,29 @@ export const TravelCreateForm = () => {
         maxHeight: "80vh",
       }}
     >
-      <Card sx={{ width: "100%", padding: 2, boxShadow: 0 }}>
+      <Card
+        sx={{
+          width: "100%",
+          padding: 2,
+          boxShadow: 0,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
         <TextField
           fullWidth
           label="Código"
           {...register("code")}
           error={!!errors.code}
           helperText={errors.code ? "Código es requerido" : ""}
+        />
+        <TextField
+          fullWidth
+          type="date"
+          {...register("createdAt")}
+          error={!!errors.createdAt}
+          helperText={errors.createdAt ? "Fecha es requerida" : ""}
         />
       </Card>
 
@@ -77,7 +100,16 @@ export const TravelCreateForm = () => {
           width: "100%",
         }}
       >
-        <Card sx={{ flex: 1, padding: 2, boxShadow: 0 }}>
+        <Card
+          sx={{
+            flex: 1,
+            padding: 2,
+            boxShadow: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
           <TextField
             fullWidth
             label="Petroleo Cargado"
@@ -106,7 +138,16 @@ export const TravelCreateForm = () => {
           />
         </Card>
 
-        <Card sx={{ flex: 1, padding: 2, boxShadow: 0 }}>
+        <Card
+          sx={{
+            flex: 1,
+            padding: 2,
+            boxShadow: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
           <TextField
             fullWidth
             label="Petroleo Consumido"
