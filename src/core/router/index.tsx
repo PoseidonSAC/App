@@ -12,9 +12,11 @@ export const AppRouter = () => {
         <Route element={<ProtectedRoutes />}>
           <Route path="/inicio" element={<Home />} />
           <Route path="/pesca/*" element={<PescaRoutes />} />
-          <Route path="/carga/*" />
+          <Route path="/cajas/*" />
           <Route path="/transporte/*" />
           <Route path="/ventas/*" />
+          <Route path="/reportes/*" />
+          <Route path="/balanza-gastos/*" />
         </Route>
       </Routes>
     </BrowserRouter>

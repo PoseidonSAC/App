@@ -19,6 +19,7 @@ import { useForm, Controller } from "react-hook-form";
 import { travelDto } from "./../../../domain/dto/travel.dto";
 import { useOtherCost } from "./../../../context/other-cost/useContext";
 import { useFishing } from "./../../../context/fishing/useContext";
+import { useChargerOperation } from "../../../context/charger-operation";
 import {
   OtherCostTravelDto,
   OtherCostTravelResDto,
@@ -48,6 +49,7 @@ export const TravelDetailPage = () => {
       <TravelResume />
       <OtherCostTravel />
       <FishingTravel />
+      <ChargerOperationOfTravel />
     </>
   );
 };
@@ -611,6 +613,99 @@ const TravelResume = () => {
           </TableRow>
         </TableBody>
       </Table>
+    </Card>
+  );
+};
+
+export const ChargerOperationOfTravel = () => {
+  const { travelSelected } = useTravel();
+  const { chargerOperation, update } = useChargerOperation();
+  const [isEditing, setIsEditing] = useState(false);
+  const [helper, setHelper] = useState(0);
+  const [travelCost, setTravelCost] = useState(0);
+
+  useEffect(() => {
+    if (chargerOperation) {
+      setHelper(chargerOperation.helper);
+      setTravelCost(chargerOperation.travel_cost);
+    }
+  }, [chargerOperation]);
+
+  const handleSave = async () => {
+    if (chargerOperation) {
+      await update(chargerOperation.id, {
+        ...chargerOperation,
+        helper,
+        id_travel: travelSelected?.id || 0,
+        travel_cost: travelCost,
+      });
+      setIsEditing(false);
+    }
+  };
+
+  if (!travelSelected) {
+    return <Typography>No hay viaje seleccionado</Typography>;
+  }
+
+  return (
+    <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
+      <Typography variant="h5" component="h1" gutterBottom>
+        Pagos para la Carga
+      </Typography>
+      {chargerOperation && (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <Typography sx={{ fontWeight: "bold" }}>
+            Toneladas: {chargerOperation.weight}
+          </Typography>
+          <Typography sx={{ fontWeight: "bold", mt: 2 }}>Pagos</Typography>
+          <Typography sx={{ ml: 2 }}>
+            Estibador: {chargerOperation.footboard}
+          </Typography>
+          <Typography sx={{ ml: 2 }}>
+            Bodeguero: {chargerOperation.charger}
+          </Typography>
+          <Typography sx={{ ml: 2 }}>
+            Cajero: {chargerOperation.grocer}
+          </Typography>
+          <TextField
+            label="Ayudante"
+            value={helper}
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            disabled={!isEditing}
+            type="number"
+            onChange={(e) => setHelper(Number(e.target.value))}
+          />
+          <TextField
+            label="Pasaje"
+            value={travelCost}
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            disabled={!isEditing}
+            type="number"
+            onChange={(e) => setTravelCost(Number(e.target.value))}
+          />
+          <Typography>
+            Total :
+            {chargerOperation.footboard +
+              chargerOperation.charger +
+              chargerOperation.grocer +
+              helper +
+              travelCost}
+          </Typography>
+        </Box>
+      )}
+      {isEditing ? (
+        <Button variant="contained" onClick={handleSave}>
+          Guardar
+        </Button>
+      ) : (
+        <Button variant="contained" onClick={() => setIsEditing(true)}>
+          Editar
+        </Button>
+      )}
     </Card>
   );
 };

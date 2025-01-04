@@ -1,5 +1,5 @@
-export interface chargerOperationDto {
-  id_vehicle: number;
+export interface ChargerOperationDto {
+  id_travel: number;
   footboard: number;
   helper: number;
   grocer: number;
@@ -9,9 +9,12 @@ export interface chargerOperationDto {
   travel_cost: number;
 }
 
-export interface chargerOperationResDto {
+export interface ChargerOperationCreateDto {
+  id_travel: number;
+}
+
+export interface ChargerOperationResDto {
   id: number;
-  id_vehicle: number;
   footboard: number;
   helper: number;
   grocer: number;

@@ -4,18 +4,19 @@ import { TravelProvider } from "../context/travel";
 import { OtherCostTravelProvider } from "../context/other-cost";
 import { FishingProvider } from "../context/fishing";
 import { TravelDetailPage } from "../pages/travel/detail";
+import { ChargerOperationProvider } from "../context/charger-operation";
 
 export const PescaRoutes = () => {
   return (
     <TravelProvider>
       <OtherCostTravelProvider>
         <FishingProvider>
-          <Routes>
-            <Route path="/" element={<TravelPage />} />
-            <Route path="/viaje/:id" element={<TravelDetailPage />} />
-            <Route path="/costo-viaje/:id" element={<h1>Costo Viaje</h1>} />
-            <Route path="/pesca/:id" element={<h1>Detalle Pesca</h1>} />
-          </Routes>
+          <ChargerOperationProvider>
+            <Routes>
+              <Route path="/" element={<TravelPage />} />
+              <Route path="/viaje/:id" element={<TravelDetailPage />} />
+            </Routes>
+          </ChargerOperationProvider>
         </FishingProvider>
       </OtherCostTravelProvider>
     </TravelProvider>

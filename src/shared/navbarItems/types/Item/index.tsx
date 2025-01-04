@@ -16,8 +16,8 @@ export const navbarItems: Item[] = [
     icon: <PhishingIcon />,
   },
   {
-    title: "Carga",
-    url: "/carga",
+    title: "Control Cajas",
+    url: "/cajas",
     icon: <InventoryIcon />,
   },
   {
