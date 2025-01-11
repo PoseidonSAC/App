@@ -43,7 +43,6 @@ export const Home = () => {
         ))}
         <Button title="Cerrar Sesión" onClick={logout} icon={<Logout />} />
       </Box>
-      <Box></Box>
     </Box>
   );
 };

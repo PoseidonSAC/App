@@ -33,9 +33,10 @@ export const TravelProvider = ({ children }: ContextProviderProps) => {
   };
 
   const update = async (id: number, travel: travelDto) => {
-    const data = await service.update(id, travel);
-    const index = travels.findIndex((t) => t.id === id);
-    travels[index] = data;
+    await service.update(id, travel);
+    setTravels((prevTravels) =>
+      prevTravels.map((t) => (t.id === id ? { ...t, ...travel } : t))
+    );
   };
 
   const remove = async (id: number) => {

@@ -30,7 +30,7 @@ export const Navbar = () => {
           Inicio
         </Button>
         <Button color="inherit" onClick={logout}>
-          Logout
+          Cerrar sesión
         </Button>
       </Toolbar>
     </AppBar>

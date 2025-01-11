@@ -1,9 +1,11 @@
 import { useContext } from "react";
-import { PescaContext } from "./context";
-export const usePesca = () => {
-  const context = useContext(PescaContext);
+import { VehicleRouteOtherCostContext } from "./context";
+export const useRoutesOtherCost = () => {
+  const context = useContext(VehicleRouteOtherCostContext);
   if (!context) {
-    throw new Error("useAuth must be used within an PescaProvider");
+    throw new Error(
+      "useRoutesOtherCost must be used within a VehicleRouteOtherCostProvider"
+    );
   }
   return context;
 };
