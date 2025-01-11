@@ -35,11 +35,15 @@ export const BoxesReturnProvider = ({ children }: ContextProviderProps) => {
   }, [controlBoxesSelected]);
 
   const create = async (data: BoxesReturnDto) => {
+    if (!boxesReturn) return;
     const response = await boxesReturnService.create(data);
-    setBoxesReturn((prev) => ({
-      ...prev,
-      [response.id_boxes]: [...(prev[response.id_boxes] || []), response],
-    }));
+    setBoxesReturn((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        [response.id_boxes]: [...(prev[response.id_boxes] || []), response],
+      };
+    });
   };
 
   const remove = async (id: number) => {
