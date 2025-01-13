@@ -177,6 +177,8 @@ const ControlOilControlled = () => {
     if (editMode) {
       if (!vehicleRoutesSelected) return;
       await updateRoute(vehicleRoutesSelected.id, oilControlled);
+      setVehicleRoutesSelected(null);
+      setEditMode(false);
     } else {
       await createRoute(oilControlled);
     }
