@@ -173,8 +173,9 @@ const ControlOilControlled = () => {
   };
 
   const handleSubmit = async () => {
-    if (!vehicleRoutesSelected) return;
+    if (!routeSelected) return;
     if (editMode) {
+      if (!vehicleRoutesSelected) return;
       await updateRoute(vehicleRoutesSelected.id, oilControlled);
     } else {
       await createRoute(oilControlled);
