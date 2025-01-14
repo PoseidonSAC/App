@@ -753,7 +753,7 @@ const LiquidationDetail = () => {
               InputLabelProps={{ shrink: true }}
             />
             <TextField
-              label="Impuestos de Entrada"
+              label="Peajes Salida"
               type="number"
               disabled={!isEdit}
               value={detail.taxes_in}
@@ -766,7 +766,7 @@ const LiquidationDetail = () => {
               required
             />
             <TextField
-              label="Impuestos de Salida"
+              label="Peajes Retorno"
               type="number"
               disabled={!isEdit}
               value={detail.taxes_out}
@@ -830,8 +830,9 @@ const LiquidationOtherCost = () => {
 
   const handleSubmit = async () => {
     if (!routeSelected) return;
-    if (!costSelected) return;
+    
     if (editMode) {
+      if (!costSelected) return;
       await updateCost(costSelected.id, cost);
     } else {
       await createCost(cost);
