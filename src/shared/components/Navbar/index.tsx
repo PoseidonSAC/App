@@ -26,6 +26,11 @@ export const Navbar = () => {
               {item.title}
             </Button>
           ))*/}
+        {location.pathname !== "/inicio" && (
+          <Button color="inherit" onClick={() => navigate(-1)}>
+            Regresar
+          </Button>
+        )}
         <Button color="inherit" onClick={() => navigate("/inicio")}>
           Inicio
         </Button>
