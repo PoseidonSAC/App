@@ -1157,7 +1157,6 @@ const LiquidationBalance = () => {
       await createBalance(balance);
     } else {
       if (!vehicleRouteBalanceSelected) return;
-
       await updateVehicleRouteBalance(vehicleRouteBalanceSelected.id, balance);
     }
     setBalance({
