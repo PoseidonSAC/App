@@ -1246,7 +1246,7 @@ const LiquidationBalance = () => {
               type="number"
               value={balance.balance}
               onChange={(e) =>
-                setBalance({ ...balance, balance: parseFloat(e.target.value) })
+                setBalance({ ...balance, balance: parseInt(e.target.value) })
               }
               required
             />
