@@ -12,10 +12,23 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
   useEffect(() => {
     const getRoutes = async () => {
       const data = await service.getVehicleRoutes();
-      setRoutes(data);
+
+      const sortedData = data.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+      setRoutes(sortedData);
     };
     getRoutes();
   }, []);
+
+  useEffect(() => {
+    const sortedRoutes = [...routes].sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+    setRoutes(sortedRoutes);
+  }, [routes]);
 
   const createRoute = async (route: VehicleRouteDto) => {
     const data = await service.create(route);
@@ -24,6 +37,7 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
 
   const updateRoute = async (id: number, route: VehicleRouteDto) => {
     await service.update(id, route);
+
     setRoutes((prevRoutes) =>
       prevRoutes.map((r) => (r.id === id ? { ...r, ...route } : r))
     );
