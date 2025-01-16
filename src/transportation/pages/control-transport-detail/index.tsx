@@ -761,6 +761,15 @@ const LiquidationDetail = () => {
               InputLabelProps={{ shrink: true }}
             />
             <TextField
+              label="Destino"
+              disabled={!isEdit}
+              value={detail.destination}
+              onChange={(e) =>
+                setDetail({ ...detail, destination: e.target.value })
+              }
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
               label="Peajes Salida"
               type="number"
               disabled={!isEdit}

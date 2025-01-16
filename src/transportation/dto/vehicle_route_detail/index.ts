@@ -4,6 +4,7 @@ export interface VehicleRouteDetailDto {
   dateEnd: string | null;
   taxes_in: number;
   taxes_out: number;
+  destination: string | null;
 }
 
 export interface VehicleRouteDetailResDto {
@@ -13,4 +14,5 @@ export interface VehicleRouteDetailResDto {
   dateEnd: string | null;
   taxes_in: number;
   taxes_out: number;
+  destination: string | null;
 }
