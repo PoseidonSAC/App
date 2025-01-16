@@ -46,10 +46,11 @@ export const TravelDetailPage = () => {
       </Box>
       <DeleteModal open={open} onClose={() => setOpen(false)} />
       <TravelDetail />
-      <TravelResume />
       <OtherCostTravel />
       <FishingTravel />
       <ChargerOperationOfTravel />
+      <VehicleOil />
+      <TravelResume />
     </>
   );
 };
@@ -89,7 +90,7 @@ const DeleteModal = ({ open, onClose }: DeleteModalProps) => {
 };
 
 export const TravelDetail = () => {
-  const { travelSelected, update } = useTravel();
+  const { travelSelected, update, SetTravelSelected } = useTravel();
   const [isEditing, setIsEditing] = useState(false);
   const [totalCost, setTotalCost] = useState(0);
 
@@ -101,7 +102,7 @@ export const TravelDetail = () => {
     setValue,
     control,
     formState: { errors },
-  } = useForm({
+  } = useForm<travelDto>({
     defaultValues: {
       code: "",
       oil_charge: 0,
@@ -111,14 +112,32 @@ export const TravelDetail = () => {
       provisions_cost: 0,
       gas_cylinder_cost: 0,
       createdAt: "",
+      oil_date_canceled: null,
+      oil_remaining: 0,
+      fishing_date_canceled: null,
+      is_concluded: false,
+      oil_vehicle: 0,
+      oil_vehicle_price: 0,
+      oil_vehicle_date_canceled: null,
     },
   });
 
-  const formatToInputDate = (isoDate: string): string =>
-    format(parseISO(isoDate.slice(0, -1)), "yyyy-MM-dd");
+  const formatToInputDate = (isoDate: string | null): string => {
+    if (isoDate == null) {
+      return "";
+    }
+    return format(parseISO(isoDate.slice(0, -1)), "yyyy-MM-dd");
+  };
+  const formatToISODate = (date: string | null): string | null => {
+    if (date == "" || date == null || isNaN(Date.parse(date))) {
+      return null;
+    }
+    return new Date(date).toISOString();
+  };
 
-  const formatToISODate = (date: string): string =>
-    new Date(date).toISOString();
+  const formatToISODateCreatAt = (date: string): string => {
+    return new Date(date).toISOString();
+  };
 
   const oilCharge = watch("oil_charge");
   const oilConsume = watch("oil_consume");
@@ -139,6 +158,12 @@ export const TravelDetail = () => {
         createdAt: travelSelected.createdAt
           ? formatToInputDate(travelSelected.createdAt)
           : "",
+        oil_date_canceled: travelSelected.oil_date_canceled
+          ? formatToInputDate(travelSelected.oil_date_canceled)
+          : "",
+        fishing_date_canceled: travelSelected.fishing_date_canceled
+          ? formatToInputDate(travelSelected.fishing_date_canceled)
+          : "",
       };
       reset(formattedData);
       setTotalCost(
@@ -151,10 +176,15 @@ export const TravelDetail = () => {
 
   const onSubmit = (data: travelDto) => {
     if (travelSelected) {
-      update(travelSelected.id, {
+      const t = {
         ...data,
-        createdAt: formatToISODate(data.createdAt),
-      });
+        id: travelSelected.id,
+        createdAt: formatToISODateCreatAt(data.createdAt),
+        oil_date_canceled: formatToISODate(data.oil_date_canceled),
+        fishing_date_canceled: formatToISODate(data.fishing_date_canceled),
+      };
+      update(travelSelected.id, t);
+      SetTravelSelected(t);
       setIsEditing(false);
     }
   };
@@ -166,133 +196,234 @@ export const TravelDetail = () => {
   }
 
   return (
-    <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
-      <Typography variant="h5" component="h1" gutterBottom>
-        Detalle del viaje
-      </Typography>
+    <Box>
+      {travelSelected.is_concluded && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            p: 2,
+            bgcolor: "primary.light",
+          }}
+        >
+          <Typography
+            variant="h4"
+            color="white"
+            sx={{
+              fontWeight: "bold",
+            }}
+          >
+            Concluido
+          </Typography>
+        </Box>
+      )}
+      <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
+        <Typography variant="h5" component="h1" gutterBottom>
+          Detalle del viaje
+        </Typography>
 
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <TextField
-          label="Gasto de Viaje"
-          value={totalCost}
-          InputProps={{
-            style: { color: "black", fontWeight: "bold" },
-          }}
-          disabled
-        />
-        <TextField
-          {...register("code")}
-          label="Código"
-          InputProps={{
-            style: { color: "black", fontWeight: "bold" },
-          }}
-          disabled={!isEditing}
-        />
-        <TextField
-          {...register("createdAt", { valueAsDate: true })}
-          label="Fecha"
-          type="date"
-          InputProps={{
-            style: { color: "black", fontWeight: "bold" },
-          }}
-          disabled={!isEditing}
-        />
-        <TextField
-          {...register("oil_charge", { valueAsNumber: true })}
-          label="Carga de Petróleo"
-          type="number"
-          InputProps={{
-            style: { color: "black", fontWeight: "bold" },
-          }}
-          disabled={!isEditing}
-        />
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <TextField
+            label="Gasto de Viaje"
+            value={totalCost}
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            disabled
+          />
+          <TextField
+            {...register("code")}
+            label="Código"
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
+            }}
+            disabled={!isEditing}
+          />
+          <TextField
+            {...register("createdAt", { valueAsDate: true })}
+            label="Fecha"
+            type="date"
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
+            }}
+            disabled={!isEditing}
+          />
+          <TextField
+            {...register("oil_charge", { valueAsNumber: true })}
+            label="Galones de Petróleo Salida"
+            type="number"
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            disabled={!isEditing}
+          />
 
-        <Controller
-          name="oil_charger_price"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              fullWidth
-              label="Gastos de carga de Petróleo"
-              type="number"
-              {...field}
-              error={!!errors.oil_charger_price}
-              helperText={errors.oil_charger_price ? "Costo es requerido" : ""}
-              InputProps={{
-                style: { color: "black", fontWeight: "bold" },
+          <Controller
+            name="oil_charger_price"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                fullWidth
+                label="Gastos de Petróleo Salida"
+                type="number"
+                {...field}
+                error={!!errors.oil_charger_price}
+                helperText={
+                  errors.oil_charger_price ? "Costo es requerido" : ""
+                }
+                InputProps={{
+                  style: { color: "black", fontWeight: "bold" },
+                }}
+                disabled={!isEditing}
+              />
+            )}
+          />
+          <TextField
+            {...register("oil_date_canceled", { valueAsDate: true })}
+            label="Fecha de Cancelacion de Petroleo Salida"
+            type="date"
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
+            }}
+            disabled={!isEditing}
+          />
+
+          <TextField
+            {...register("oil_consume", { valueAsNumber: true })}
+            label="Galones de Consumo de Petróleo"
+            type="number"
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            disabled={!isEditing}
+          />
+
+          <Controller
+            name="oil_consume_price"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                fullWidth
+                label="Gastos de Consumo de Petróleo"
+                type="number"
+                {...field}
+                error={!!errors.oil_consume_price}
+                helperText={
+                  errors.oil_consume_price ? "Costo es requerido" : ""
+                }
+                InputProps={{
+                  style: { color: "black", fontWeight: "bold" },
+                }}
+                disabled={!isEditing}
+              />
+            )}
+          />
+
+          <TextField
+            fullWidth
+            label="Petroleo Queda"
+            {...register("oil_remaining")}
+            type="number"
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            disabled={!isEditing}
+          />
+
+          <TextField
+            {...register("provisions_cost", { valueAsNumber: true })}
+            label="Viveres"
+            type="number"
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            disabled={!isEditing}
+          />
+          <TextField
+            {...register("gas_cylinder_cost", { valueAsNumber: true })}
+            label="Balon de Gas"
+            type="number"
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            disabled={!isEditing}
+          />
+
+          <TextField
+            {...register("fishing_date_canceled", { valueAsDate: true })}
+            label="Fecha de Cancelacion de la Pesca"
+            type="date"
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
+            }}
+            disabled={!isEditing}
+          />
+
+          {watch("is_concluded") ? (
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                setValue("is_concluded", false);
               }}
               disabled={!isEditing}
-            />
-          )}
-        />
-        <TextField
-          {...register("oil_consume", { valueAsNumber: true })}
-          label="Consumo de Petróleo"
-          type="number"
-          InputProps={{
-            style: { color: "black", fontWeight: "bold" },
-          }}
-          disabled={!isEditing}
-        />
-
-        <Controller
-          name="oil_consume_price"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              fullWidth
-              label="Gastos de carga de Petróleo"
-              type="number"
-              {...field}
-              error={!!errors.oil_consume_price}
-              helperText={errors.oil_consume_price ? "Costo es requerido" : ""}
-              InputProps={{
-                style: { color: "black", fontWeight: "bold" },
+            >
+              Reabrir
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => {
+                setValue("is_concluded", true);
               }}
               disabled={!isEditing}
-            />
+            >
+              Concluir
+            </Button>
           )}
-        />
 
-        <TextField
-          {...register("provisions_cost", { valueAsNumber: true })}
-          label="Viveres"
-          type="number"
-          InputProps={{
-            style: { color: "black", fontWeight: "bold" },
-          }}
-          disabled={!isEditing}
-        />
-        <TextField
-          {...register("gas_cylinder_cost", { valueAsNumber: true })}
-          label="Balon de Gas"
-          type="number"
-          InputProps={{
-            style: { color: "black", fontWeight: "bold" },
-          }}
-          disabled={!isEditing}
-        />
-
-        {isEditing ? (
-          <Button
-            variant="contained"
-            sx={{ marginTop: 2 }}
-            onClick={handleSubmit(onSubmit)}
-          >
-            Guardar
-          </Button>
-        ) : (
-          <Button
-            variant="contained"
-            sx={{ marginTop: 2 }}
-            onClick={() => setIsEditing(true)}
-            type="button"
-          >
-            Editar
-          </Button>
-        )}
-      </Box>
-    </Card>
+          {isEditing ? (
+            <Button
+              variant="contained"
+              sx={{ marginTop: 2 }}
+              onClick={handleSubmit(onSubmit)}
+            >
+              Guardar
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              sx={{ marginTop: 2 }}
+              onClick={() => setIsEditing(true)}
+              type="button"
+            >
+              Editar
+            </Button>
+          )}
+        </Box>
+      </Card>
+    </Box>
   );
 };
 
@@ -300,10 +431,11 @@ const OtherCostTravel = () => {
   const { otherCostTravels, create, update, remove } = useOtherCost();
   const [selectedCost, setSelectedCost] =
     useState<OtherCostTravelResDto | null>(null);
-  const { register, handleSubmit, reset, setValue } = useForm({
+  const { register, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues: {
       id_travel: 0,
       description: "",
+      is_added: false,
       price: 0,
     },
   });
@@ -322,6 +454,7 @@ const OtherCostTravel = () => {
     setSelectedCost(cost);
     setValue("description", cost.description);
     setValue("price", cost.price);
+    setValue("is_added", cost.is_added);
   };
 
   const handleDelete = async (id: number) => {
@@ -353,6 +486,24 @@ const OtherCostTravel = () => {
             type="number"
             required
           />
+          {watch("is_added") ? (
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => setValue("is_added", false)}
+            >
+              Quitar de la Division
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => setValue("is_added", true)}
+            >
+              Agregar a la Division
+            </Button>
+          )}
+
           <Button variant="contained" type="submit">
             {selectedCost ? "Actualizar" : "Guardar"}
           </Button>
@@ -375,6 +526,7 @@ const OtherCostTravel = () => {
           <TableRow>
             <TableCell>Descripción</TableCell>
             <TableCell>Costo</TableCell>
+            <TableCell>División</TableCell>
             <TableCell>Acciones</TableCell>
           </TableRow>
         </TableHead>
@@ -383,6 +535,10 @@ const OtherCostTravel = () => {
             <TableRow key={otherCost.id}>
               <TableCell>{otherCost.description}</TableCell>
               <TableCell>{otherCost.price}</TableCell>
+              <TableCell>
+                {otherCost.is_added ? "A la Division" : "No a la Division"}
+              </TableCell>
+
               <TableCell>
                 <Button
                   variant="contained"
@@ -563,7 +719,12 @@ const TravelResume = () => {
     1000;
 
   const total_other_cost = otherCostTravels.reduce(
-    (acc, otherCost) => acc + otherCost.price,
+    (acc, otherCost) => (!otherCost.is_added ? acc + otherCost.price : acc),
+    0
+  );
+
+  const total_other_cost_added = otherCostTravels.reduce(
+    (acc, otherCost) => (otherCost.is_added ? acc + otherCost.price : acc),
     0
   );
 
@@ -588,6 +749,12 @@ const TravelResume = () => {
             <TableCell>Gasto de viaje</TableCell>
             <TableCell>{totalCost}</TableCell>
           </TableRow>
+
+          <TableRow>
+            <TableCell>Otros Gastos Agregados a la Division</TableCell>
+            <TableCell>{total_other_cost_added}</TableCell>
+          </TableRow>
+
           <TableRow>
             <TableCell>Otros Gastos</TableCell>
             <TableCell>{total_other_cost}</TableCell>
@@ -605,11 +772,15 @@ const TravelResume = () => {
 
           <TableRow>
             <TableCell>Total Liquido</TableCell>
-            <TableCell>{totalFishing - totalCost}</TableCell>
+            <TableCell>
+              {totalFishing - totalCost - total_other_cost_added}
+            </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Repartición</TableCell>
-            <TableCell>{(totalFishing - totalCost) / 2}</TableCell>
+            <TableCell>
+              {(totalFishing - totalCost - total_other_cost_added) / 2}
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -617,42 +788,77 @@ const TravelResume = () => {
   );
 };
 
-export const ChargerOperationOfTravel = () => {
+const ChargerOperationOfTravel = () => {
   const { travelSelected } = useTravel();
-  const { chargerOperation, update } = useChargerOperation();
+  const { chargerOperation, update, setChargerOperation } =
+    useChargerOperation();
   const [isEditing, setIsEditing] = useState(false);
   const [helper, setHelper] = useState(0);
+  const [canceledDate, setCanceledDate] = useState("");
   const [travelCost, setTravelCost] = useState(0);
 
   useEffect(() => {
     if (chargerOperation) {
       setHelper(chargerOperation.helper);
       setTravelCost(chargerOperation.travel_cost);
+      setCanceledDate(formatToInputDate(chargerOperation.date_canceled) || "");
     }
   }, [chargerOperation]);
 
   const handleSave = async () => {
     if (chargerOperation) {
-      await update(chargerOperation.id, {
+      const c = {
         ...chargerOperation,
         helper,
-        id_travel: travelSelected?.id || 0,
         travel_cost: travelCost,
-      });
+        date_canceled: formatToISODate(canceledDate),
+        id_travel: travelSelected?.id || 0,
+      };
+      await update(chargerOperation.id, c);
+
+      setChargerOperation(c);
       setIsEditing(false);
     }
   };
 
-  if (!travelSelected) {
+  const formatToISODate = (date: string) => {
+    if (date == "") return null;
+    return new Date(date).toISOString();
+  };
+
+  const formatToInputDate = (isoDate: string | null): string =>
+    isoDate == null ? "" : format(parseISO(isoDate.slice(0, -1)), "yyyy-MM-dd");
+
+  if (!travelSelected || !chargerOperation) {
     return <Typography>No hay viaje seleccionado</Typography>;
   }
 
   return (
     <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
       <Typography variant="h5" component="h1" gutterBottom>
-        Pagos para la Carga
+        Pagos de Tripulantes
       </Typography>
-      {chargerOperation && (
+      {chargerOperation.date_canceled && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            p: 2,
+            bgcolor: "primary.light",
+          }}
+        >
+          <Typography
+            variant="h4"
+            color="white"
+            sx={{
+              fontWeight: "bold",
+            }}
+          >
+            Cancelado
+          </Typography>
+        </Box>
+      )}
+      {
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           <Typography sx={{ fontWeight: "bold" }}>
             Toneladas: {chargerOperation.weight}
@@ -687,6 +893,22 @@ export const ChargerOperationOfTravel = () => {
             type="number"
             onChange={(e) => setTravelCost(Number(e.target.value))}
           />
+          <TextField
+            label="Fecha de Cancelación"
+            value={canceledDate}
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
+            }}
+            disabled={!isEditing}
+            type="date"
+            onChange={(e) => setCanceledDate(e.target.value)}
+          />
+
           <Typography>
             Total :
             {chargerOperation.footboard +
@@ -696,7 +918,129 @@ export const ChargerOperationOfTravel = () => {
               travelCost}
           </Typography>
         </Box>
+      }
+      {isEditing ? (
+        <Button variant="contained" onClick={handleSave}>
+          Guardar
+        </Button>
+      ) : (
+        <Button variant="contained" onClick={() => setIsEditing(true)}>
+          Editar
+        </Button>
       )}
+    </Card>
+  );
+};
+
+const VehicleOil = () => {
+  const { travelSelected, update, SetTravelSelected } = useTravel();
+  const [isEditing, setIsEditing] = useState(false);
+  const [oilVehicle, setOilVehicle] = useState(0);
+  const [canceledDate, setCanceledDate] = useState("");
+  const [price, setPrice] = useState(0);
+  const formatToInputDate = (isoDate: string | null): string => {
+    if (isoDate == null) return "";
+    return format(parseISO(isoDate.slice(0, -1)), "yyyy-MM-dd");
+  };
+
+  const formatToISODate = (date: string): string | null => {
+    if (date == "") return null;
+    return new Date(date).toISOString();
+  };
+
+  useEffect(() => {
+    if (travelSelected) {
+      setOilVehicle(travelSelected.oil_vehicle);
+      setPrice(travelSelected.oil_vehicle_price);
+      setCanceledDate(
+        formatToInputDate(travelSelected.oil_vehicle_date_canceled)
+      );
+    }
+  }, [travelSelected]);
+
+  const handleSave = async () => {
+    if (travelSelected) {
+      const t = {
+        ...travelSelected,
+        oil_vehicle: oilVehicle,
+        oil_vehicle_price: price,
+        oil_vehicle_date_canceled: formatToISODate(canceledDate),
+      };
+      await update(travelSelected.id, t);
+      SetTravelSelected(t);
+      setIsEditing(false);
+    }
+  };
+
+  if (!travelSelected) {
+    return <Typography>No hay viaje seleccionado</Typography>;
+  }
+
+  return (
+    <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
+      <Typography variant="h5" component="h1" gutterBottom>
+        Petróleo de Vehículo
+      </Typography>
+      {travelSelected.oil_vehicle_date_canceled && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            p: 2,
+            bgcolor: "primary.light",
+            mb: 2,
+          }}
+        >
+          <Typography
+            variant="h4"
+            color="white"
+            sx={{
+              fontWeight: "bold",
+            }}
+          >
+            Cancelado
+          </Typography>
+        </Box>
+      )}
+      {
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <TextField
+            label="Petróleo de Vehículo"
+            value={oilVehicle}
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            disabled={!isEditing}
+            type="number"
+            onChange={(e) => setOilVehicle(Number(e.target.value))}
+          />
+          <TextField
+            label="Gasto de Petróleo de Vehículo"
+            value={price}
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            disabled={!isEditing}
+            type="number"
+            onChange={(e) => setPrice(Number(e.target.value))}
+          />
+          <TextField
+            label="Fecha de Cancelación"
+            value={canceledDate}
+            InputProps={{
+              style: { color: "black", fontWeight: "bold" },
+            }}
+            slotProps={{
+              inputLabel: {
+                shrink: true,
+              },
+            }}
+            disabled={!isEditing}
+            type="date"
+            onChange={(e) => setCanceledDate(e.target.value)}
+          />
+        </Box>
+      }
       {isEditing ? (
         <Button variant="contained" onClick={handleSave}>
           Guardar

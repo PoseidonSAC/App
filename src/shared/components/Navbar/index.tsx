@@ -16,16 +16,6 @@ export const Navbar = () => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           JUANY S.A.C
         </Typography>
-        {/*items &&
-          items.map((item, index) => (
-            <Button
-              key={index}
-              color="inherit"
-              onClick={() => navigate(item.url)}
-            >
-              {item.title}
-            </Button>
-          ))*/}
         {location.pathname !== "/inicio" && (
           <Button color="inherit" onClick={() => navigate(-1)}>
             Regresar

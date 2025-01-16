@@ -13,6 +13,13 @@ const defaultValues: travelDto = {
   provisions_cost: 0,
   gas_cylinder_cost: 0,
   createdAt: "",
+  is_concluded: false,
+  fishing_date_canceled: null,
+  oil_date_canceled: null,
+  oil_remaining: 0,
+  oil_vehicle: 0,
+  oil_vehicle_price: 0,
+  oil_vehicle_date_canceled: null,
 };
 
 export interface TravelCreateFormProps {
@@ -112,7 +119,7 @@ export const TravelCreateForm = ({ close }: TravelCreateFormProps) => {
         >
           <TextField
             fullWidth
-            label="Petroleo Cargado"
+            label="Galones Petroleo Salida"
             type="number"
             {...register("oil_charge", { valueAsNumber: true })}
             error={!!errors.oil_charge}
@@ -126,7 +133,7 @@ export const TravelCreateForm = ({ close }: TravelCreateFormProps) => {
             render={({ field }) => (
               <TextField
                 fullWidth
-                label="Costo"
+                label="Gasto Petroleo Salida"
                 type="number"
                 {...field}
                 error={!!errors.oil_charger_price}
@@ -164,7 +171,7 @@ export const TravelCreateForm = ({ close }: TravelCreateFormProps) => {
             render={({ field }) => (
               <TextField
                 fullWidth
-                label="Costo"
+                label="Gasto Petrolo Consumido"
                 type="number"
                 {...field}
                 error={!!errors.oil_consume_price}
@@ -179,7 +186,7 @@ export const TravelCreateForm = ({ close }: TravelCreateFormProps) => {
         <Card sx={{ flex: 1, padding: 2, boxShadow: 0 }}>
           <TextField
             fullWidth
-            label="Proviciones"
+            label="Viveres"
             type="number"
             {...register("provisions_cost", { valueAsNumber: true })}
             error={!!errors.provisions_cost}

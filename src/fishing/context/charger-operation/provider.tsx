@@ -41,15 +41,15 @@ export const ChargerOperationProvider = ({
       const decimal = weight - entero;
       let round_weight;
 
-      if (decimal < 0.5) {
+      if (decimal < 0.4) {
         round_weight = entero;
-      } else if (decimal < 0.85) {
+      } else if (decimal < 0.8) {
         round_weight = entero + 0.5;
       } else {
         round_weight = entero + 1;
       }
 
-      const chargerOperationData = {
+      const chargerOperationData: ChargerOperationDto = {
         id_travel: travelSelected?.id || 0,
         footboard: round_weight * 50,
         helper: chargerOperation?.helper || 0,
@@ -58,6 +58,7 @@ export const ChargerOperationProvider = ({
         weight: round_weight,
         charger: round_weight * 50,
         travel_cost: chargerOperation?.travel_cost || 0,
+        date_canceled: chargerOperation?.date_canceled || null,
       };
 
       if (chargerOperation) {

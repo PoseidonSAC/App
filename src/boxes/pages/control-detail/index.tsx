@@ -26,7 +26,7 @@ import {
 } from "@mui/material";
 
 import { useState } from "react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 export const BoxControlPageDetail = () => {
   const { boxes, create, remove, update, boxesSelected, setBoxesSelected } =
@@ -79,6 +79,9 @@ export const BoxControlPageDetail = () => {
     });
   };
 
+  const formatToInputDate = (isoDate: string): string =>
+    format(parseISO(isoDate.slice(0, -1)), "dd-MM-yyyy");
+
   const handleEdit = (box: BoxesResDto) => {
     setIsEditing(true);
     setNewBox(box);
@@ -87,6 +90,29 @@ export const BoxControlPageDetail = () => {
 
   return (
     <Card sx={{ p: 3, mb: 3 }}>
+      {controlBoxesSelected && (
+        <Box
+          sx={{
+            mb: 3,
+            bgcolor: "primary.main",
+            color: "white",
+            p: 2,
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h5" gutterBottom>
+            Control de Cajas de {controlBoxesSelected?.code}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            En {controlBoxesSelected?.place} el{" "}
+            {formatToInputDate(controlBoxesSelected?.date_arrive)}
+          </Typography>
+
+          <Typography variant="h6" gutterBottom>
+            {controlBoxesSelected?.concluded ? "Concluido" : "Pendiente"}
+          </Typography>
+        </Box>
+      )}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" gutterBottom>
           Agregar Cajas

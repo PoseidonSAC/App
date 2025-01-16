@@ -7,6 +7,7 @@ export interface ChargerOperationDto {
   weight: number;
   charger: number;
   travel_cost: number;
+  date_canceled: string | null;
 }
 
 export interface ChargerOperationCreateDto {
@@ -22,4 +23,5 @@ export interface ChargerOperationResDto {
   weight: number;
   charger: number;
   travel_cost: number;
+  date_canceled: string | null;
 }

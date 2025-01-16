@@ -20,7 +20,7 @@ import {
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 export const BoxControlPage = () => {
   const { controlBoxes, setControlBoxesSelected, create, remove, update } =
@@ -36,7 +36,10 @@ export const BoxControlPage = () => {
   const navigate = useNavigate();
 
   const handleCreate = () => {
-    create(newControlBoxe);
+    create({
+      ...newControlBoxe,
+      date_arrive: formatToISODate(newControlBoxe.date_arrive),
+    });
     setNewControlBoxe({
       code: "",
       concluded: false,
@@ -44,6 +47,17 @@ export const BoxControlPage = () => {
       place: "",
     });
   };
+
+  const formatToInputDate = (isoDate: string): string => {
+    return format(parseISO(isoDate.slice(0, -1)), "yyyy-MM-dd");
+  };
+
+  const formatToTableDate = (isoDate: string): string => {
+    return format(parseISO(isoDate.slice(0, -1)), "dd/MM/yyyy");
+  };
+
+  const formatToISODate = (date: string): string =>
+    new Date(date).toISOString();
 
   const handleDelete = async (id: number) => {
     await remove(id);
@@ -55,13 +69,16 @@ export const BoxControlPage = () => {
     setNewControlBoxe({
       code: controlBoxe.code,
       concluded: controlBoxe.concluded,
-      date_arrive: handleFomatDateInput(controlBoxe.date_arrive),
+      date_arrive: formatToInputDate(controlBoxe.date_arrive),
       place: controlBoxe.place,
     });
   };
 
   const handleSendUpdate = () => {
-    update(idControlBoxe, newControlBoxe);
+    update(idControlBoxe, {
+      ...newControlBoxe,
+      date_arrive: formatToISODate(newControlBoxe.date_arrive),
+    });
     setIsEditing(false);
     setIdControlBoxe(0);
     setNewControlBoxe({
@@ -75,17 +92,6 @@ export const BoxControlPage = () => {
   const handleSelectControlBoxe = (controlBoxe: ControlBoxesResDto) => {
     setControlBoxesSelected(controlBoxe);
     navigate(`/cajas/control/${controlBoxe.id}`);
-  };
-
-  const handleFomatDate = (date: string) => {
-    const dateWithoutTime = date.split("Z")[0];
-    return format(dateWithoutTime, "dd/MM/yyyy");
-  };
-
-  const handleFomatDateInput = (date: string) => {
-    if (!date) return "";
-    const dateWithoutTime = date.split("Z")[0];
-    return format(dateWithoutTime, "yyyy-MM-dd");
   };
 
   return (
@@ -165,7 +171,7 @@ export const BoxControlPage = () => {
                 <TableCell>{controlBoxe.code}</TableCell>
                 <TableCell>{controlBoxe.place}</TableCell>
                 <TableCell>
-                  {handleFomatDate(controlBoxe.date_arrive)}
+                  {formatToTableDate(controlBoxe.date_arrive)}
                 </TableCell>
                 <TableCell>
                   {controlBoxe.concluded
