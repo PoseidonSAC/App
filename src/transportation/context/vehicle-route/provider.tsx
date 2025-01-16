@@ -15,7 +15,7 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
 
       const sortedData = data.sort(
         (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
       setRoutes(sortedData);
     };
@@ -26,7 +26,7 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
     const data = await service.create(route);
     const sorted = [...routes, data].sort(
       (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
     setRoutes(sorted);
   };
@@ -37,7 +37,7 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
       prevRoutes.map((r) => (r.id === id ? { ...r, ...route } : r));
     const sorted = updatedRoutes(routes).sort(
       (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
     setRoutes(sorted);
   };
