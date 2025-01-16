@@ -68,6 +68,13 @@ export const ControlTransportDetail = () => {
     setVehicle(vehicle || null);
   }, [routeSelected, vehicles]);
 
+  const formatDate = (date: string) => {
+    const dateFormated = date.slice(0, -1);
+    return format(new Date(dateFormated), "dd/MM/yyyy");
+  };
+
+  if (!routeSelected || !vehicle) return null;
+
   return (
     <Box>
       <Box
@@ -82,7 +89,8 @@ export const ControlTransportDetail = () => {
           variant="h5"
           sx={{ marginBottom: 2, fontWeight: "bold", color: "primary.main" }}
         >
-          Detalles de Transporte de {vehicle?.name}
+          Detalles de Transporte de {vehicle?.name} {vehicle?.user}{" "}
+          {formatDate(routeSelected?.createdAt)}
         </Typography>
       </Box>
       <ControlTransportDetailLiquidation />
@@ -830,7 +838,7 @@ const LiquidationOtherCost = () => {
 
   const handleSubmit = async () => {
     if (!routeSelected) return;
-    
+
     if (editMode) {
       if (!costSelected) return;
       await updateCost(costSelected.id, cost);
