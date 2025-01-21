@@ -27,7 +27,7 @@ import { useRoutes } from "../../context/routes";
 import { useVehicleRoutesOil } from "../../context/vehicle_routes_oil_use";
 import { useVehicle } from "../../context/transportist";
 
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 import {
   VehicleRoutesOilUseDto,
@@ -59,7 +59,7 @@ export const ControlTransportDetail = () => {
   const { routeSelected } = useVehicleRoute();
   const { vehicles } = useVehicle();
   const [vehicle, setVehicle] = useState<VehicleDto | null>(null);
-
+  const { routeDetail } = useRouteDetail();
   useEffect(() => {
     if (!routeSelected || !vehicles) return;
     const vehicle = vehicles.find(
@@ -70,10 +70,10 @@ export const ControlTransportDetail = () => {
 
   const formatDate = (date: string) => {
     const dateFormated = date.slice(0, -1);
-    return format(new Date(dateFormated), "dd/MM/yyyy");
+    return format(parseISO(dateFormated), "dd/MM/yyyy");
   };
 
-  if (!routeSelected || !vehicle) return null;
+  if (!routeSelected || !vehicle || !routeDetail) return null;
 
   return (
     <Box>
@@ -83,6 +83,7 @@ export const ControlTransportDetail = () => {
           justifyContent: "flex-start",
           gap: 2,
           padding: 2,
+          flexDirection: "column",
         }}
       >
         <Typography
@@ -91,6 +92,7 @@ export const ControlTransportDetail = () => {
         >
           Detalles de Transporte de {vehicle?.name} {vehicle?.user}{" "}
           {formatDate(routeSelected?.createdAt)}
+          {routeDetail.destination && ` - Destino: ${routeDetail.destination}`}
         </Typography>
       </Box>
       <ControlTransportDetailLiquidation />
@@ -155,17 +157,16 @@ const ControlOilControlled = () => {
     updateFilteredRoutes();
   }, [routeSelected, vehicleRoutes, routes, vehicles]);
 
+  const handleISODate = (date: string) => {
+    return new Date(date).toISOString();
+  };
+
   const handleDate = (date: string) => {
-    const dateFormated = date.split("Z")[0];
-    return format(dateFormated, "dd/MM");
+    return format(parseISO(date.slice(0, -1)), "dd/MM");
   };
 
   const handleDateEdit = (date: string) => {
-    const dateFormated = date.split("Z")[0];
-    if (dateFormated === "") {
-      return "";
-    }
-    return format(dateFormated, "yyyy-MM-dd");
+    return format(parseISO(date.slice(0, -1)), "yyyy-MM-dd");
   };
 
   const handleOpen = () => setOpen(true);
@@ -184,11 +185,17 @@ const ControlOilControlled = () => {
     if (!routeSelected) return;
     if (editMode) {
       if (!vehicleRoutesSelected) return;
-      await updateRoute(vehicleRoutesSelected.id, oilControlled);
+      await updateRoute(vehicleRoutesSelected.id, {
+        ...oilControlled,
+        createdAt: handleISODate(oilControlled.createdAt),
+      });
       setVehicleRoutesSelected(null);
       setEditMode(false);
     } else {
-      await createRoute(oilControlled);
+      await createRoute({
+        ...oilControlled,
+        createdAt: handleISODate(oilControlled.createdAt),
+      });
     }
     setOilControlled({
       id_route: vehicleRoutesFiltered[0]?.id || 0,
@@ -200,7 +207,7 @@ const ControlOilControlled = () => {
   };
 
   const handleEdit = (route: VehicleRoutesResDto) => {
-    setOilControlled(route);
+    setOilControlled({ ...route, createdAt: handleDateEdit(route.createdAt) });
     setVehicleRoutesSelected(route);
     setEditMode(true);
     handleOpen();
@@ -300,18 +307,21 @@ const ControlOilControlled = () => {
               label="Uso de Petróleo"
               type="number"
               value={oilControlled.oil_use}
-              onChange={(e) =>
-                setOilControlled({
-                  ...oilControlled,
-                  oil_use: parseFloat(e.target.value),
-                })
-              }
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value)) {
+                  setOilControlled({
+                    ...oilControlled,
+                    oil_use: value,
+                  });
+                }
+              }}
               required
             />
             <TextField
               label="Fecha"
               type="date"
-              value={handleDateEdit(oilControlled.createdAt)}
+              value={oilControlled.createdAt}
               onChange={(e) =>
                 setOilControlled({
                   ...oilControlled,
@@ -654,7 +664,7 @@ const LiquidationResult = () => {
             variant="h6"
             sx={{ marginBottom: 2, textAlign: "center" }}
           >
-            LIQUIDACION
+            LIQUIDACION DE GASTOS
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -710,20 +720,38 @@ const LiquidationDetail = () => {
 
   useEffect(() => {
     if (routeDetail) {
-      setDetail(routeDetail);
+      setDetail({
+        ...routeDetail,
+        dateInit: handleDate(routeDetail.dateInit),
+        dateEnd: handleDate(routeDetail.dateEnd),
+      });
     }
   }, [routeDetail]);
 
   const handleDate = (date: string | null) => {
     if (!date) return "";
-    return format(new Date(date), "yyyy-MM-dd");
+    console.log(date);
+    return format(parseISO(date.slice(0, -1)), "yyyy-MM-dd");
+  };
+
+  const handleSubmitDate = (date: string) => {
+    return new Date(date).toISOString();
   };
 
   const handleSubmit = async () => {
     if (detail) {
-      await updateRoute(detail.id, detail);
+      await updateRoute(detail.id, {
+        ...detail,
+        dateInit: handleSubmitDate(detail.dateInit),
+        dateEnd: detail.dateEnd ? handleSubmitDate(detail.dateEnd) : null,
+      });
       setIsEdit(false);
     }
+  };
+
+  const handleEdit = () => {
+    if (!detail) return;
+    setIsEdit(true);
   };
 
   return (
@@ -743,7 +771,7 @@ const LiquidationDetail = () => {
               label="Fecha de Inicio"
               type="date"
               disabled={!isEdit}
-              value={detail.dateInit ? handleDate(detail.dateInit) : ""}
+              value={detail.dateInit}
               onChange={(e) =>
                 setDetail({ ...detail, dateInit: e.target.value })
               }
@@ -754,7 +782,7 @@ const LiquidationDetail = () => {
               label="Fecha de Fin"
               type="date"
               disabled={!isEdit}
-              value={detail.dateEnd ? handleDate(detail.dateEnd) : ""}
+              value={detail.dateEnd}
               onChange={(e) =>
                 setDetail({ ...detail, dateEnd: e.target.value })
               }
@@ -762,8 +790,9 @@ const LiquidationDetail = () => {
             />
             <TextField
               label="Destino"
+              type="text"
               disabled={!isEdit}
-              value={detail.destination}
+              value={detail.destination || ""}
               onChange={(e) =>
                 setDetail({ ...detail, destination: e.target.value })
               }
@@ -803,7 +832,7 @@ const LiquidationDetail = () => {
                 </Button>
               </Box>
             ) : (
-              <Button variant="contained" onClick={() => setIsEdit(true)}>
+              <Button variant="contained" onClick={handleEdit}>
                 Editar
               </Button>
             )}

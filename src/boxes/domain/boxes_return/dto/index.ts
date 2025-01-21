@@ -10,7 +10,3 @@ export interface BoxesReturnResDto {
   date: string;
   quantity: number;
 }
-
-export interface BoxesReturnGrouped {
-  [id_boxes: number]: BoxesReturnResDto[];
-}

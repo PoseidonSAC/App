@@ -6,6 +6,7 @@ export class BoxesService {
 
   async getAll(): Promise<BoxesResDto[]> {
     const response = await api.get(`${this.apiURL}`);
+    console.log(response.data);
     return response.data;
   }
 

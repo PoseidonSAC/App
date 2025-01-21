@@ -31,7 +31,6 @@ export const BoxControlPage = () => {
     code: "",
     concluded: false,
     date_arrive: "",
-    place: "",
   });
   const navigate = useNavigate();
 
@@ -44,7 +43,6 @@ export const BoxControlPage = () => {
       code: "",
       concluded: false,
       date_arrive: "",
-      place: "",
     });
   };
 
@@ -70,7 +68,6 @@ export const BoxControlPage = () => {
       code: controlBoxe.code,
       concluded: controlBoxe.concluded,
       date_arrive: formatToInputDate(controlBoxe.date_arrive),
-      place: controlBoxe.place,
     });
   };
 
@@ -85,7 +82,6 @@ export const BoxControlPage = () => {
       code: "",
       concluded: false,
       date_arrive: "",
-      place: "",
     });
   };
 
@@ -108,14 +104,7 @@ export const BoxControlPage = () => {
           }
           InputLabelProps={{ shrink: true }}
         />
-        <TextField
-          label="Lugar"
-          value={newControlBoxe.place}
-          onChange={(e) =>
-            setNewControlBoxe({ ...newControlBoxe, place: e.target.value })
-          }
-          InputLabelProps={{ shrink: true }}
-        />
+
         <TextField
           label="Fecha de llegada"
           value={newControlBoxe.date_arrive}
@@ -158,6 +147,7 @@ export const BoxControlPage = () => {
             <TableRow>
               <TableCell>Código</TableCell>
               <TableCell>Lugar</TableCell>
+              <TableCell>Cajas</TableCell>
               <TableCell>Fecha de llegada</TableCell>
               <TableCell>Dias Transcurridos</TableCell>
               <TableCell> Liquidado</TableCell>
@@ -169,7 +159,30 @@ export const BoxControlPage = () => {
             {controlBoxes.map((controlBoxe) => (
               <TableRow key={controlBoxe.id}>
                 <TableCell>{controlBoxe.code}</TableCell>
-                <TableCell>{controlBoxe.place}</TableCell>
+                <TableCell>
+                  {controlBoxe.control_place.length > 0 ? (
+                    controlBoxe.control_place.map((place) => (
+                      <p key={place.id}>{place.name}</p>
+                    ))
+                  ) : (
+                    <p>No hay lugares</p>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {controlBoxe.control_place.length > 0 ? (
+                    controlBoxe.control_place.map((place) => (
+                      <p key={place.id}>
+                        {place.boxes.map((box) => (
+                          <span key={box.id}>
+                            {box.color} - {box.name}
+                          </span>
+                        ))}
+                      </p>
+                    ))
+                  ) : (
+                    <p>No hay cajas</p>
+                  )}
+                </TableCell>
                 <TableCell>
                   {formatToTableDate(controlBoxe.date_arrive)}
                 </TableCell>

@@ -1,11 +1,9 @@
+import { BoxesReturnResDto } from "../../boxes_return/dto";
 export interface BoxesDto {
   color: string;
   name: string;
   quantity: number;
-  reported_by: string;
-  id_control_boxes: number;
-  createdAt: string;
-  hasLiquid: boolean;
+  id_control_place: number;
 }
 
 export interface BoxesResDto {
@@ -13,8 +11,6 @@ export interface BoxesResDto {
   color: string;
   name: string;
   quantity: number;
-  reported_by: string;
-  id_control_boxes: number;
-  createdAt: string;
-  hasLiquid: boolean;
+  id_control_place: number;
+  boxesReturn: BoxesReturnResDto[];
 }

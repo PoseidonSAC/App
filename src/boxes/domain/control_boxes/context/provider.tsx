@@ -21,14 +21,14 @@ export const ControlBoxesProvider = ({ children }: ContextProviderProps) => {
 
   const update = async (id: number, controlBoxes: ControlBoxesDto) => {
     await service.update(id, controlBoxes);
-    setControlBoxes((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, ...controlBoxes } : f))
-    );
+    const data = await service.getAll();
+    setControlBoxes(data);
   };
 
   const create = async (data: ControlBoxesDto) => {
-    const dataCreated = await service.create(data);
-    setControlBoxes([...controlBoxes, dataCreated]);
+    await service.create(data);
+    const alldata = await service.getAll();
+    setControlBoxes(alldata);
   };
 
   const remove = async (id: number) => {

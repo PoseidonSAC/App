@@ -20,7 +20,7 @@ import {
   Box,
 } from "@mui/material";
 import { useVehicle } from "../../context/transportist";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 export const ControlTransport = () => {
   const { routes, createRoute, deleteRoute, setRouteSelected, updateRoute } =
@@ -36,7 +36,10 @@ export const ControlTransport = () => {
   });
 
   const handleCreateRoute = () => {
-    createRoute(newRoute);
+    createRoute({
+      ...newRoute,
+      createdAt: formatToISODate(newRoute.createdAt),
+    });
     setNewRoute({
       createdAt: "",
       id_vehicle: 0,
@@ -52,14 +55,17 @@ export const ControlTransport = () => {
     setIsEditing(true);
     setIdRoute(route.id);
     setNewRoute({
-      createdAt: handleFomatDate(route.createdAt),
+      createdAt: formatToInputDate(route.createdAt),
       id_vehicle: route.id_vehicle,
       state: route.state,
     });
   };
 
   const SendUpdateRoute = async (newRoute: VehicleRouteDto) => {
-    await updateRoute(idRoute, newRoute);
+    await updateRoute(idRoute, {
+      ...newRoute,
+      createdAt: formatToISODate(newRoute.createdAt),
+    });
     setIsEditing(false);
     setNewRoute({
       createdAt: "",
@@ -68,16 +74,15 @@ export const ControlTransport = () => {
     });
   };
 
-  const handleDate = (date: string) => {
-    const dateWithoutZ = date.split("Z")[0];
-    const dateFormatted = new Date(dateWithoutZ);
-    return format(dateFormatted, "dd/MM/yyyy");
+  const handleDate = (isoDate: string) => {
+    return format(parseISO(isoDate.slice(0, -1)), "dd-MM-yyyy");
   };
 
-  const handleFomatDate = (date: string) => {
-    const dateWithoutZ = date.split("Z")[0];
-    const dateFormatted = new Date(dateWithoutZ);
-    return format(dateFormatted, "yyyy-MM-dd");
+  const formatToInputDate = (isoDate: string): string => {
+    return format(parseISO(isoDate.slice(0, -1)), "yyyy-MM-dd");
+  };
+  const formatToISODate = (date: string) => {
+    return new Date(date).toISOString();
   };
 
   const handleSelectRoute = (route: VehicleRouteResDto) => {
