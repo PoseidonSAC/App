@@ -274,7 +274,7 @@ export const TravelDetail = () => {
             render={({ field }) => (
               <TextField
                 fullWidth
-                label="Gastos de Petróleo Salida"
+                label="Costo de Petróleo Salida"
                 type="number"
                 {...field}
                 error={!!errors.oil_charger_price}
@@ -319,7 +319,7 @@ export const TravelDetail = () => {
             render={({ field }) => (
               <TextField
                 fullWidth
-                label="Gastos de Consumo de Petróleo"
+                label="Costo de Consumo de Petróleo"
                 type="number"
                 {...field}
                 error={!!errors.oil_consume_price}
@@ -337,7 +337,7 @@ export const TravelDetail = () => {
           <TextField
             fullWidth
             label="Petroleo Queda"
-            {...register("oil_remaining")}
+            {...register("oil_remaining", { valueAsNumber: true })}
             type="number"
             InputProps={{
               style: { color: "black", fontWeight: "bold" },
