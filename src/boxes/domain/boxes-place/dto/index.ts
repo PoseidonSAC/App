@@ -4,7 +4,6 @@ export interface BoxesPlaceDto {
   name: string;
   date_arrive: string;
   concluded: boolean;
-  reported_by: string;
   hasLiquid: boolean;
 }
 

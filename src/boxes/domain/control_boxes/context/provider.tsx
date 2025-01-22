@@ -11,7 +11,6 @@ export const ControlBoxesProvider = ({ children }: ContextProviderProps) => {
   const service = new ControlBoxesService();
 
   useEffect(() => {
-    const service = new ControlBoxesService();
     const getControlBoxes = async () => {
       const data = await service.getAll();
       setControlBoxes(data);
@@ -24,7 +23,10 @@ export const ControlBoxesProvider = ({ children }: ContextProviderProps) => {
     const data = await service.getAll();
     setControlBoxes(data);
   };
-
+  const getControlBoxes = async () => {
+    const data = await service.getAll();
+    setControlBoxes(data);
+  };
   const create = async (data: ControlBoxesDto) => {
     await service.create(data);
     const alldata = await service.getAll();
@@ -45,6 +47,7 @@ export const ControlBoxesProvider = ({ children }: ContextProviderProps) => {
         update,
         create,
         remove,
+        getControlBoxes,
       }}
     >
       {children}

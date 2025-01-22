@@ -459,6 +459,7 @@ const OtherCostTravel = () => {
 
   const handleDelete = async (id: number) => {
     await remove(id);
+    console.log("Eliminado");
   };
 
   return (
@@ -694,6 +695,7 @@ const FishingTravel = () => {
 
 const TravelResume = () => {
   const { travelSelected } = useTravel();
+  const { chargerOperation } = useChargerOperation();
   const { fishings } = useFishing();
   const { otherCostTravels } = useOtherCost();
 
@@ -728,6 +730,13 @@ const TravelResume = () => {
     0
   );
 
+  const vehicle_cost = travelSelected.oil_vehicle_price;
+  const cost_charge =
+    (chargerOperation?.travel_cost || 0) +
+    (chargerOperation?.helper || 0) +
+    (chargerOperation?.footboard || 0) +
+    (chargerOperation?.charger || 0) +
+    (chargerOperation?.grocer || 0);
   return (
     <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
       <Typography variant="h5" component="h1" gutterBottom>
@@ -758,6 +767,16 @@ const TravelResume = () => {
           <TableRow>
             <TableCell>Otros Gastos</TableCell>
             <TableCell>{total_other_cost}</TableCell>
+          </TableRow>
+
+          <TableRow>
+            <TableCell>Petroleo de Vehiculo</TableCell>
+            <TableCell>{vehicle_cost}</TableCell>
+          </TableRow>
+
+          <TableRow>
+            <TableCell>Pago Tripulantes</TableCell>
+            <TableCell>{cost_charge}</TableCell>
           </TableRow>
 
           <TableRow>

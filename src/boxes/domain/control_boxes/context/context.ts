@@ -9,6 +9,7 @@ export interface ControlBoxesContextProps {
   create: (controlBoxes: ControlBoxesDto) => Promise<void>;
   controlBoxesSelected: ControlBoxesResDto | null;
   setControlBoxesSelected: (controlBoxes: ControlBoxesResDto | null) => void;
+  getControlBoxes: () => Promise<void>;
 }
 
 export const ControlBoxesContext =

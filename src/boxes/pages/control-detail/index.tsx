@@ -65,7 +65,8 @@ export const BoxControlPageDetail = () => {
 };
 
 export const BoxesPlace = () => {
-  const { boxesPlace, create, update, remove } = useBoxesPlace();
+  const { boxesPlace, create, update, remove, getControlBoxes } =
+    useBoxesPlace();
   const { controlBoxesSelected } = useControlBoxes();
 
   const style = {
@@ -83,10 +84,9 @@ export const BoxesPlace = () => {
   const [idControlBoxe, setIdControlBoxe] = useState<number>(0);
   const [open, setOpen] = useState(false);
   const dummy = {
-    name: "",
+    name: "VENTANILLA",
     concluded: false,
     date_arrive: "",
-    reported_by: "",
     hasLiquid: false,
     id_control_boxes: 0,
   };
@@ -99,12 +99,20 @@ export const BoxesPlace = () => {
       date_arrive: formatToISODate(newControlBoxe.date_arrive),
       id_control_boxes: controlBoxesSelected.id,
     });
+    await getControlBoxes();
+    await getControlBoxes();
     setNewControlBoxe(dummy);
+
     setOpen(false);
   };
 
   const handleDelete = async (id: number) => {
     await remove(id);
+    setNewControlBoxe(dummy);
+    await getControlBoxes();
+    await getControlBoxes();
+    setOpen(false);
+    setIsEditing(false);
   };
 
   const handleUpdate = async (id: number) => {
@@ -112,8 +120,11 @@ export const BoxesPlace = () => {
       ...newControlBoxe,
       date_arrive: formatToISODate(newControlBoxe.date_arrive),
     });
+    await getControlBoxes();
+    await getControlBoxes();
     setNewControlBoxe(dummy);
     setOpen(false);
+    setIsEditing(false);
   };
 
   const formatToInputDate = (isoDate: string): string => {
@@ -134,7 +145,6 @@ export const BoxesPlace = () => {
       name: box.name,
       concluded: box.concluded,
       date_arrive: formatToInputDate(box.date_arrive),
-      reported_by: box.reported_by,
       hasLiquid: box.hasLiquid,
       id_control_boxes: box.id_control_boxes,
     });
@@ -160,7 +170,7 @@ export const BoxesPlace = () => {
               <TableCell>Name</TableCell>
               <TableCell>Concluded</TableCell>
               <TableCell>Date Arrive</TableCell>
-              <TableCell>Reported By</TableCell>
+              <TableCell>Days Transurred</TableCell>
               <TableCell>Has Liquid</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
@@ -171,7 +181,13 @@ export const BoxesPlace = () => {
                 <TableCell>{box.name}</TableCell>
                 <TableCell>{box.concluded ? "Yes" : "No"}</TableCell>
                 <TableCell>{formatToTableDate(box.date_arrive)}</TableCell>
-                <TableCell>{box.reported_by}</TableCell>
+                <TableCell>
+                  {Math.ceil(
+                    (new Date().getTime() -
+                      new Date(box.date_arrive).getTime()) /
+                      (1000 * 3600 * 24)
+                  )}
+                </TableCell>
                 <TableCell>{box.hasLiquid ? "Yes" : "No"}</TableCell>
                 <TableCell>
                   <Button onClick={() => handleEdit(box)}>Edit</Button>
@@ -188,14 +204,25 @@ export const BoxesPlace = () => {
             {isEditing ? "Edit Box" : "Add New Box"}
           </Typography>
           <TextField
-            label="Name"
+            label="Lugar"
+            select
             value={newControlBoxe.name}
             onChange={(e) =>
               setNewControlBoxe({ ...newControlBoxe, name: e.target.value })
             }
             fullWidth
+            InputLabelProps={{
+              shrink: true,
+            }}
             margin="normal"
-          />
+            SelectProps={{
+              native: true,
+            }}
+          >
+            <option value="VENTANILLA">VENTANILLA</option>
+            <option value="VILLAMARIA">VILLAMARIA</option>
+            <option value="GRIFO">GRIFO</option>
+          </TextField>
           <TextField
             label="Date Arrive"
             type="date"
@@ -210,18 +237,7 @@ export const BoxesPlace = () => {
             margin="normal"
             InputLabelProps={{ shrink: true }}
           />
-          <TextField
-            label="Reported By"
-            value={newControlBoxe.reported_by}
-            onChange={(e) =>
-              setNewControlBoxe({
-                ...newControlBoxe,
-                reported_by: e.target.value,
-              })
-            }
-            fullWidth
-            margin="normal"
-          />
+
           <InputLabel>Concluded</InputLabel>
           <Switch
             checked={newControlBoxe.concluded}
@@ -258,7 +274,7 @@ export const BoxesPlace = () => {
 
 export const BoxBoxes = () => {
   const { create, update, remove, setBoxesSelected } = useBoxes();
-  const { boxesPlace } = useBoxesPlace();
+  const { boxesPlace, getControlBoxes } = useBoxesPlace();
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [idBoxePlace, setIdBoxePlace] = useState<number>(0);
@@ -284,6 +300,7 @@ export const BoxBoxes = () => {
   const handleCreate = async (box: BoxesDto, boxePlaceId: number) => {
     await create({ ...box, id_control_place: boxePlaceId });
     setNewBox(dummy);
+    await getControlBoxes();
     setOpen(false);
   };
 
@@ -295,7 +312,19 @@ export const BoxBoxes = () => {
   };
 
   const handleDelete = async (id: number) => {
-    remove(id);
+    await remove(id);
+    setNewBox(dummy);
+    setOpen(false);
+    setIsEditing(false);
+    await getControlBoxes();
+  };
+
+  const handleUpdate = async (id: number) => {
+    await update(id, newBox);
+    setNewBox(dummy);
+    setOpen(false);
+    setIsEditing(false);
+    await getControlBoxes();
   };
 
   const handleOpen = () => setOpen(true);
@@ -370,9 +399,11 @@ export const BoxBoxes = () => {
               <TextField
                 label="Quantity"
                 value={newBox.quantity}
-                onChange={(e) =>
-                  setNewBox({ ...newBox, quantity: parseInt(e.target.value) })
-                }
+                type="number"
+                onChange={(e) => {
+                  if (isNaN(parseInt(e.target.value))) return;
+                  setNewBox({ ...newBox, quantity: parseInt(e.target.value) });
+                }}
                 fullWidth
                 margin="normal"
               />
@@ -380,7 +411,7 @@ export const BoxBoxes = () => {
               <Button
                 onClick={() =>
                   isEditing
-                    ? update(idBoxePlace, newBox)
+                    ? handleUpdate(idBoxePlace)
                     : handleCreate(newBox, place.id)
                 }
               >
@@ -419,7 +450,6 @@ export const BoxControlBoxesReturn = ({
     date: "",
   };
   const [newBoxReturn, setNewBoxReturn] = useState<BoxesReturnDto>(dummy);
-
   const handleCreateReturn = async () => {
     if (!boxesSelected) return;
     await create({
@@ -504,6 +534,17 @@ export const BoxControlBoxesReturn = ({
           {isEditing ? "Update" : "Create"}
         </Button>
 
+        <Card>
+          <Typography variant="h6">Pendientes</Typography>
+          <Typography variant="h6">
+            {boxesSelected &&
+              boxesSelected?.quantity -
+                boxesReturn.reduce(
+                  (acc, boxReturn) => acc + boxReturn.quantity,
+                  0
+                )}
+          </Typography>
+        </Card>
         <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
           <Table stickyHeader>
             <TableHead>
@@ -531,7 +572,6 @@ export const BoxControlBoxesReturn = ({
             </TableBody>
           </Table>
         </TableContainer>
-        <Card></Card>
       </MuiBox>
     </Modal>
   );

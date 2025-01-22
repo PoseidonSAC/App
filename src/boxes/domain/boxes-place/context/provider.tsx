@@ -13,12 +13,17 @@ export const BoxesPlaceProvider = ({ children }: ContextProviderProps) => {
   const { controlBoxesSelected } = useControlBoxes();
 
   useEffect(() => {
+    const getControlBoxes = async () => {
+      if (!controlBoxesSelected) return;
+      const data = await service.getByIdControlBoxes(controlBoxesSelected.id);
+      setBoxesPlace(data);
+    };
     getControlBoxes();
   }, [controlBoxesSelected]);
 
   const update = async (id: number, controlBoxes: BoxesPlaceDto) => {
     await service.update(id, controlBoxes);
-    getControlBoxes();
+    await getControlBoxes();
   };
 
   const getControlBoxes = async () => {
@@ -26,6 +31,7 @@ export const BoxesPlaceProvider = ({ children }: ContextProviderProps) => {
     const data = await service.getByIdControlBoxes(controlBoxesSelected.id);
     setBoxesPlace(data);
   };
+
   const create = async (data: BoxesPlaceDto) => {
     if (!controlBoxesSelected) return;
     await service.create(data);
@@ -34,7 +40,7 @@ export const BoxesPlaceProvider = ({ children }: ContextProviderProps) => {
 
   const remove = async (id: number) => {
     await service.delete(id);
-    getControlBoxes();
+    await getControlBoxes();
   };
 
   return (

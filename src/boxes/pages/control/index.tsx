@@ -172,11 +172,20 @@ export const BoxControlPage = () => {
                   {controlBoxe.control_place.length > 0 ? (
                     controlBoxe.control_place.map((place) => (
                       <p key={place.id}>
-                        {place.boxes.map((box) => (
-                          <span key={box.id}>
-                            {box.color} - {box.name}
-                          </span>
-                        ))}
+                        {place.boxes
+                          .filter(
+                            (box, index, self) =>
+                              index ===
+                              self.findIndex(
+                                (b) =>
+                                  b.color === box.color && b.name === box.name
+                              )
+                          )
+                          .map((box) => (
+                            <span key={box.id}>
+                              {box.color} - {box.name}
+                            </span>
+                          ))}
                       </p>
                     ))
                   ) : (
