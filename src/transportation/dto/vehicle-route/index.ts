@@ -9,4 +9,9 @@ export interface VehicleRouteResDto {
   state: string;
   createdAt: string;
   id_vehicle: number;
+  vehicle: VehicleName;
+}
+
+export interface VehicleName {
+  name: string;
 }
