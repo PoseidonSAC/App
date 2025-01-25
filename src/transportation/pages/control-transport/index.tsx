@@ -150,15 +150,8 @@ export const ControlTransportTable = ({
   handleDeleteRoute,
   handleUpdateRoute,
 }: ControlTransportTableProps) => {
-  const { vehicles } = useVehicle();
-
   const handleDate = (isoDate: string) => {
     return format(parseISO(isoDate.slice(0, -1)), "dd-MM-yyyy");
-  };
-
-  const getVehicleName = (id: number) => {
-    const vehicle = vehicles.find((v) => v.id === id);
-    return vehicle ? vehicle.name : "Unknown";
   };
 
   return (
@@ -177,7 +170,7 @@ export const ControlTransportTable = ({
             <TableRow key={route.id}>
               <TableCell>{handleDate(route.createdAt)}</TableCell>
               <TableCell>{route.state}</TableCell>
-              <TableCell>{getVehicleName(route.id_vehicle)}</TableCell>
+              <TableCell>{route.vehicle.name}</TableCell>
               <TableCell
                 style={{
                   display: "flex",
