@@ -14,8 +14,13 @@ import { useNavigate } from "react-router-dom";
 
 const items: Item[] = [
   { title: "Choferes", icon: <AccountBoxIcon />, url: "/transporte/choferes" },
-  { title: "Control", icon: <MonitorIcon />, url: "/transporte/control" },
   { title: "Rutas", icon: <AddRoadIcon />, url: "/transporte/rutas" },
+  { title: "Control", icon: <MonitorIcon />, url: "/transporte/control" },
+  {
+    title: "Uso de Petroleo",
+    icon: <MonitorIcon />,
+    url: "/transporte/control/petroleo-destino",
+  },
 ];
 
 export const MainTransportation = () => {

@@ -33,6 +33,11 @@ export const RoutesDetailProvider = ({ children }: ContextProviderProps) => {
     return data;
   };
 
+  const VehicleUsegeOilByDestination = async (destination: string) => {
+    const data = await service.getVehicleRouteUseOilDestiny(destination);
+    return data;
+  };
+
   return (
     <VehicleRouteDetailContext.Provider
       value={{
@@ -40,6 +45,7 @@ export const RoutesDetailProvider = ({ children }: ContextProviderProps) => {
         updateRoute,
         getRoute,
         setRouteDetail,
+        VehicleUsegeOilByDestination,
       }}
     >
       {children}

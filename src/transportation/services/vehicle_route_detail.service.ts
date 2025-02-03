@@ -3,6 +3,7 @@ import { api } from "../../core/api";
 import {
   VehicleRouteDetailDto,
   VehicleRouteDetailResDto,
+  VehicleRouteDetailUseOilDestiny,
 } from "../dto/vehicle_route_detail";
 
 export class VehicleRouteDetailService {
@@ -37,6 +38,15 @@ export class VehicleRouteDetailService {
     id: number
   ): Promise<VehicleRouteDetailResDto | null> {
     const response = await api.get(`${this.apiURL}/vehicle-route/${id}`);
+    return response.data;
+  }
+
+  async getVehicleRouteUseOilDestiny(
+    destination: string
+  ): Promise<VehicleRouteDetailUseOilDestiny[]> {
+    const response = await api.get(
+      `${this.apiURL}/vehicle-route-use/${destination}`
+    );
     return response.data;
   }
 }

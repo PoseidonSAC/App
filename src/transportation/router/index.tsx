@@ -14,6 +14,7 @@ import { VehicleRouteOtherCostProvider } from "../context/other-cost";
 import { RoutesShow } from "./../pages/routes";
 import { ControlTransport } from "../pages/control-transport";
 import { ControlTransportDetail } from "../pages/control-transport-detail";
+import { VehicleUseOilDestiny } from "../pages/control-transport-oil-destiny";
 
 export const TransportationRoutes = () => {
   return (
@@ -52,6 +53,10 @@ export const TransportationRoutes = () => {
                               <Route
                                 path=":id"
                                 element={<ControlTransportDetail />}
+                              />
+                              <Route
+                                path="petroleo-destino"
+                                element={<VehicleUseOilDestiny />}
                               />
                             </Routes>
                           </VehicleRouteOtherCostProvider>
