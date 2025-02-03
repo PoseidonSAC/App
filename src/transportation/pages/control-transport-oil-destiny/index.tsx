@@ -40,7 +40,7 @@ export const VehicleUseOilDestiny = () => {
       >
         <TextField
           {...register("destination")}
-          label="Destination"
+          label="Destino"
           variant="outlined"
           style={{ flex: 1 }}
         />
