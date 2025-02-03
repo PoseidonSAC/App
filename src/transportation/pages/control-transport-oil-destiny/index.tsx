@@ -23,7 +23,7 @@ export const VehicleUseOilDestiny = () => {
   const onSubmit = async (data: { destination: string }) => {
     const response = await VehicleUsegeOilByDestination(data.destination);
     response.sort(
-      (a, b) => new Date(a.dateInit).getTime() - new Date(b.dateInit).getTime()
+      (a, b) => new Date(b.dateInit).getTime() - new Date(a.dateInit).getTime()
     );
     setOilUse(response);
   };
