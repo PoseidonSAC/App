@@ -67,7 +67,7 @@ export const VehicleUseOilDestiny = () => {
                 <TableRow key={index}>
                   <TableCell>{formatToTableDate(oil.dateInit)}</TableCell>
                   <TableCell>{oil.vehicle}</TableCell>
-                  <TableCell>{oil.destination}</TableCell>
+                  <TableCell>{oil.point_charge}</TableCell>
                   <TableCell>{oil.vehicle_route_oil_usage}</TableCell>
                 </TableRow>
               ))}

@@ -30,6 +30,7 @@ export const TransportistShow = () => {
     plate: "",
     type: "",
     phone: "",
+    is_active: true,
   });
 
   const handleEdit = (vehicle: VehicleRestDto) => {
@@ -40,6 +41,7 @@ export const TransportistShow = () => {
       plate: vehicle.plate,
       type: vehicle.type,
       phone: vehicle.phone,
+      is_active: vehicle.is_active,
     });
   };
 
@@ -60,6 +62,7 @@ export const TransportistShow = () => {
       plate: "",
       type: "",
       phone: "",
+      is_active: true,
     });
   };
 
@@ -111,8 +114,25 @@ export const TransportistShow = () => {
             }
             fullWidth
           />
+          {vehicleSelected && (
+            <TextField
+              label="Estado"
+              value={formData.is_active ? "Activo" : "Inactivo"}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  is_active: e.target.value === "Activo",
+                })
+              }
+              fullWidth
+              select
+            >
+              <MenuItem value="Activo">Activo</MenuItem>
+              <MenuItem value="Inactivo">Inactivo</MenuItem>
+            </TextField>
+          )}
           <Button variant="contained" color="primary" onClick={handleSubmit}>
-            {vehicleSelected ? "Update" : "Create"}
+            {vehicleSelected ? "Editar" : "Crear"}
           </Button>
         </Box>
       </Container>
@@ -130,6 +150,7 @@ export const TransportistShow = () => {
             <TableCell>Placa</TableCell>
             <TableCell>Tipo</TableCell>
             <TableCell>Teléfono</TableCell>
+            <TableCell>Estado</TableCell>
             <TableCell>Acciones</TableCell>
           </TableRow>
         </TableHead>
@@ -141,6 +162,7 @@ export const TransportistShow = () => {
               <TableCell>{vehicle.plate}</TableCell>
               <TableCell>{vehicle.type}</TableCell>
               <TableCell>{vehicle.phone}</TableCell>
+              <TableCell>{vehicle.is_active ? "Activo" : "Inactivo"}</TableCell>
               <TableCell
                 sx={{
                   display: "flex",
@@ -152,14 +174,14 @@ export const TransportistShow = () => {
                   color="secondary"
                   onClick={() => handleEdit(vehicle)}
                 >
-                  Edit
+                  Editar
                 </Button>
                 <Button
                   variant="contained"
                   color="error"
                   onClick={() => handleDelete(vehicle)}
                 >
-                  Delete
+                  Eliminar
                 </Button>
               </TableCell>
             </TableRow>

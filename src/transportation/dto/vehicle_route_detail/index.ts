@@ -4,7 +4,9 @@ export interface VehicleRouteDetailDto {
   dateEnd: string | null;
   taxes_in: number;
   taxes_out: number;
-  destination: string | null;
+  point_charge: string | null;
+  who_destination: string | null;
+  destiny: string | null;
 }
 
 export interface VehicleRouteDetailResDto {
@@ -14,14 +16,18 @@ export interface VehicleRouteDetailResDto {
   dateEnd: string | null;
   taxes_in: number;
   taxes_out: number;
-  destination: string | null;
+  point_charge: string | null;
+  who_destination: string | null;
+  destiny: string | null;
 }
 
 export interface VehicleRouteDetailUseOilDestiny {
   id: number;
   id_vehicle_route: number;
   dateInit: string;
-  destination: string | null;
+  point_charge: string | null;
+  who_destination: string | null;
+  destiny: string | null;
   vehicle: string;
   vehicle_route_oil_usage: number;
 }

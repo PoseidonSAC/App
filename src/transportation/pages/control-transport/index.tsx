@@ -107,11 +107,13 @@ export const ControlTransportForm = ({
             setNewRoute({ ...newRoute, id_vehicle: e.target.value as number })
           }
         >
-          {vehicles.map((vehicle) => (
-            <MenuItem key={vehicle.id} value={vehicle.id}>
-              {vehicle.name}
-            </MenuItem>
-          ))}
+          {vehicles
+            .filter((vehicle) => vehicle.is_active)
+            .map((vehicle) => (
+              <MenuItem key={vehicle.id} value={vehicle.id}>
+                {vehicle.name}
+              </MenuItem>
+            ))}
         </Select>
       </FormControl>
       {!isEditing ? (
@@ -138,14 +140,12 @@ export const ControlTransportForm = ({
 };
 
 interface ControlTransportTableProps {
-  routes: VehicleRouteResDto[];
   handleSelectRoute: (route: VehicleRouteResDto) => void;
   handleDeleteRoute: (id: number) => void;
   handleUpdateRoute: (route: VehicleRouteResDto) => void;
 }
 
 export const ControlTransportTable = ({
-  routes,
   handleSelectRoute,
   handleDeleteRoute,
   handleUpdateRoute,
@@ -153,6 +153,8 @@ export const ControlTransportTable = ({
   const handleDate = (isoDate: string) => {
     return format(parseISO(isoDate.slice(0, -1)), "dd-MM-yyyy");
   };
+
+  const { filteredRoutes } = useVehicleRoute();
 
   return (
     <TableContainer component={Paper} style={{ marginTop: "20px" }}>
@@ -162,15 +164,30 @@ export const ControlTransportTable = ({
             <TableCell>Fecha</TableCell>
             <TableCell>Estado</TableCell>
             <TableCell>Vehiculo</TableCell>
+            <TableCell>Punto de Carga</TableCell>
+            <TableCell>Destino</TableCell>
+            <TableCell>Quien Liquida</TableCell>
             <TableCell>Acciones</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {routes.map((route) => (
+          {filteredRoutes.map((route) => (
             <TableRow key={route.id}>
               <TableCell>{handleDate(route.createdAt)}</TableCell>
               <TableCell>{route.state}</TableCell>
               <TableCell>{route.vehicle.name}</TableCell>
+              <TableCell>
+                {route.vehicle_route_detail?.point_charge || "No especificado"}
+              </TableCell>
+
+              <TableCell>
+                {route.vehicle_route_detail?.destiny || "No especificado"}
+              </TableCell>
+              <TableCell>
+                {route.vehicle_route_detail?.who_destination ||
+                  "No especificado"}
+              </TableCell>
+
               <TableCell
                 style={{
                   display: "flex",
@@ -209,7 +226,7 @@ export const ControlTransportTable = ({
 };
 
 export const ControlTransport = () => {
-  const { routes, createRoute, deleteRoute, setRouteSelected, updateRoute } =
+  const { createRoute, deleteRoute, setRouteSelected, updateRoute } =
     useVehicleRoute();
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [idRoute, setIdRoute] = useState<number>(0);
@@ -219,8 +236,6 @@ export const ControlTransport = () => {
     id_vehicle: 0,
     state: "INICIADO",
   });
-  const [filteredRoutes, setFilteredRoutes] =
-    useState<VehicleRouteResDto[]>(routes);
 
   const handleSelectRoute = (route: VehicleRouteResDto) => {
     setRouteSelected(route);
@@ -243,12 +258,8 @@ export const ControlTransport = () => {
         newRoute={newRoute}
         setNewRoute={setNewRoute}
       />
-      <ControlTransportFilter
-        routes={routes}
-        setFilteredRoutes={setFilteredRoutes}
-      />
+      <ControlTransportFilter />
       <ControlTransportTable
-        routes={filteredRoutes}
         handleSelectRoute={handleSelectRoute}
         handleDeleteRoute={deleteRoute}
         handleUpdateRoute={(route) => {
@@ -265,25 +276,12 @@ export const ControlTransport = () => {
   );
 };
 
-interface ControlTransportFilterProps {
-  routes: VehicleRouteResDto[];
-  setFilteredRoutes: (routes: VehicleRouteResDto[]) => void;
-}
-
-export const ControlTransportFilter = ({
-  routes,
-  setFilteredRoutes,
-}: ControlTransportFilterProps) => {
-  const [searchTerm, setSearchTerm] = useState<string>("");
+export const ControlTransportFilter = () => {
+  const { searchTerm, setSearchTerm, routes, setFilteredRoutes, handleFilter } =
+    useVehicleRoute();
 
   const handleSearch = () => {
-    const filtered = routes.filter(
-      (route) =>
-        route.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        route.createdAt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        route.vehicle.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredRoutes(filtered);
+    handleFilter();
   };
 
   const handleReset = () => {
@@ -292,7 +290,14 @@ export const ControlTransportFilter = ({
   };
 
   return (
-    <Box style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+    <Box
+      style={{
+        display: "flex",
+        gap: "10px",
+        marginBottom: "20px",
+        marginTop: "20px",
+      }}
+    >
       <TextField
         label="Buscar"
         value={searchTerm}

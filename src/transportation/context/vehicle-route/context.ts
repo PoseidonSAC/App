@@ -8,6 +8,11 @@ export interface VehicleRouteContextProps {
   getRoute: (id: number) => Promise<VehicleRouteResDto>;
   routeSelected: VehicleRouteResDto | null;
   setRouteSelected: (route: VehicleRouteResDto | null) => void;
+  searchTerm: string;
+  setSearchTerm: (search: string) => void;
+  filteredRoutes: VehicleRouteResDto[];
+  setFilteredRoutes: (routes: VehicleRouteResDto[]) => void;
+  handleFilter: () => void;
 }
 
 export const VehicleRouteContext =

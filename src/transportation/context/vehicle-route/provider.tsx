@@ -8,6 +8,12 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
   const [routeSelected, setRouteSelected] = useState<VehicleRouteResDto | null>(
     null
   );
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [filteredRoutes, setFilteredRoutes] = useState<VehicleRouteResDto[]>(
+    []
+  );
+
   const service = new VehicleRouteService();
   useEffect(() => {
     const getRoutes = async () => {
@@ -22,9 +28,14 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
     getRoutes();
   }, []);
 
+  useEffect(() => {
+    handleFilter();
+  }, [routes, searchTerm]);
+
   const createRoute = async (route: VehicleRouteDto) => {
-    const data = await service.create(route);
-    const sorted = [...routes, data].sort(
+    await service.create(route);
+    const data = await service.getVehicleRoutes();
+    const sorted = data.sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
@@ -33,9 +44,9 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
 
   const updateRoute = async (id: number, route: VehicleRouteDto) => {
     await service.update(id, route);
-    const updatedRoutes = (prevRoutes: VehicleRouteResDto[]) =>
-      prevRoutes.map((r) => (r.id === id ? { ...r, ...route } : r));
-    const sorted = updatedRoutes(routes).sort(
+    const data = await service.getVehicleRoutes();
+
+    const sorted = data.sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
@@ -52,6 +63,16 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
     return data;
   };
 
+  const handleFilter = () => {
+    const filtered = routes.filter(
+      (route) =>
+        route.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        route.createdAt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        route.vehicle.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredRoutes(filtered);
+  };
+
   return (
     <VehicleRouteContext.Provider
       value={{
@@ -62,6 +83,11 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
         getRoute,
         routeSelected,
         setRouteSelected,
+        searchTerm,
+        setSearchTerm,
+        filteredRoutes,
+        setFilteredRoutes,
+        handleFilter,
       }}
     >
       {children}

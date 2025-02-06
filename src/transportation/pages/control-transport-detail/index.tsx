@@ -92,7 +92,8 @@ export const ControlTransportDetail = () => {
         >
           Detalles de Transporte de {vehicle?.name} {vehicle?.user}{" "}
           {formatDate(routeSelected?.createdAt)}
-          {routeDetail.destination && ` - Destino: ${routeDetail.destination}`}
+          {routeDetail.point_charge &&
+            ` - Punto de Carga: ${routeDetail.point_charge}`}
         </Typography>
       </Box>
       <ControlTransportDetailLiquidation />
@@ -730,7 +731,6 @@ const LiquidationDetail = () => {
 
   const handleDate = (date: string | null) => {
     if (!date) return "";
-    console.log(date);
     return format(parseISO(date.slice(0, -1)), "yyyy-MM-dd");
   };
 
@@ -792,12 +792,35 @@ const LiquidationDetail = () => {
               label="Destino"
               type="text"
               disabled={!isEdit}
-              value={detail.destination || ""}
+              value={detail.destiny || ""}
               onChange={(e) =>
-                setDetail({ ...detail, destination: e.target.value })
+                setDetail({ ...detail, destiny: e.target.value })
               }
               InputLabelProps={{ shrink: true }}
             />
+
+            <TextField
+              label="Punto Carga"
+              type="text"
+              disabled={!isEdit}
+              value={detail.point_charge || ""}
+              onChange={(e) =>
+                setDetail({ ...detail, point_charge: e.target.value })
+              }
+              InputLabelProps={{ shrink: true }}
+            />
+
+            <TextField
+              label="Quien Liquida "
+              type="text"
+              disabled={!isEdit}
+              value={detail.who_destination || ""}
+              onChange={(e) =>
+                setDetail({ ...detail, who_destination: e.target.value })
+              }
+              InputLabelProps={{ shrink: true }}
+            />
+
             <TextField
               label="Peajes Salida"
               type="number"

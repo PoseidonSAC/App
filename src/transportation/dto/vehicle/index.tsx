@@ -4,6 +4,7 @@ export interface VehicleDto {
   plate: string;
   type: string;
   phone: string;
+  is_active: boolean;
 }
 
 export interface VehicleRestDto {
@@ -13,4 +14,5 @@ export interface VehicleRestDto {
   plate: string;
   type: string;
   phone: string;
+  is_active: boolean;
 }
