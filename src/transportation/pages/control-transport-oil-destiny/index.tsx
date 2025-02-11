@@ -25,6 +25,7 @@ export const VehicleUseOilDestiny = () => {
     response.sort(
       (a, b) => new Date(b.dateInit).getTime() - new Date(a.dateInit).getTime()
     );
+    console.log(response);
     setOilUse(response);
   };
 

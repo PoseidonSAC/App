@@ -13,6 +13,7 @@ export interface VehicleRouteContextProps {
   filteredRoutes: VehicleRouteResDto[];
   setFilteredRoutes: (routes: VehicleRouteResDto[]) => void;
   handleFilter: () => void;
+  getRoutes: () => Promise<void>;
 }
 
 export const VehicleRouteContext =

@@ -65,7 +65,8 @@ export const ControlTransportForm = ({
     setNewRoute({
       createdAt: "",
       id_vehicle: 0,
-      state: "INICIADO",
+      state: "NO ENTREGADO",
+      is_concluded: "NO",
     });
   };
 
@@ -75,28 +76,6 @@ export const ControlTransportForm = ({
 
   return (
     <Box style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      <TextField
-        label="Fecha"
-        value={newRoute.createdAt || ""}
-        type="date"
-        onChange={(e) =>
-          setNewRoute({ ...newRoute, createdAt: e.target.value })
-        }
-        InputLabelProps={{ shrink: true }}
-      />
-      <FormControl fullWidth>
-        <InputLabel id="state-select-label">Estado</InputLabel>
-        <Select
-          labelId="state-select-label"
-          label="Estado"
-          value={newRoute.state}
-          onChange={(e) => setNewRoute({ ...newRoute, state: e.target.value })}
-        >
-          <MenuItem value="ESPERA">ESPERA</MenuItem>
-          <MenuItem value="LIQUIDADO">LIQUIDADO</MenuItem>
-          <MenuItem value="INICIADO">INICIADO</MenuItem>
-        </Select>
-      </FormControl>
       <FormControl fullWidth>
         <InputLabel id="vehicle-select-label">Vehiculo</InputLabel>
         <Select
@@ -116,6 +95,36 @@ export const ControlTransportForm = ({
             ))}
         </Select>
       </FormControl>
+      <TextField
+        label="Fecha"
+        value={newRoute.createdAt || ""}
+        type="date"
+        onChange={(e) =>
+          setNewRoute({ ...newRoute, createdAt: e.target.value })
+        }
+        InputLabelProps={{ shrink: true }}
+      />
+      <FormControl fullWidth>
+        <InputLabel id="state-select-label">Hoja de Gastos</InputLabel>
+        <Select
+          labelId="state-select-label"
+          label="Hoja de Gastos"
+          value={newRoute.state}
+          onChange={(e) => setNewRoute({ ...newRoute, state: e.target.value })}
+        >
+          <MenuItem value="ENTREGADO">ENTREGADO</MenuItem>
+          <MenuItem value="NO ENTREGADO">NO ENTREGADO</MenuItem>
+        </Select>
+      </FormControl>
+      <TextField
+        label="Liquidado"
+        value={newRoute.is_concluded}
+        onChange={(e) =>
+          setNewRoute({ ...newRoute, is_concluded: e.target.value })
+        }
+        fullWidth
+      />
+
       {!isEditing ? (
         <MuiButton
           type="submit"
@@ -162,11 +171,12 @@ export const ControlTransportTable = ({
         <TableHead>
           <TableRow>
             <TableCell>Fecha</TableCell>
-            <TableCell>Estado</TableCell>
+            <TableCell>Hoja de Gastos</TableCell>
             <TableCell>Vehiculo</TableCell>
             <TableCell>Punto de Carga</TableCell>
             <TableCell>Destino</TableCell>
             <TableCell>Quien Liquida</TableCell>
+            <TableCell>Liquidado</TableCell>
             <TableCell>Acciones</TableCell>
           </TableRow>
         </TableHead>
@@ -187,6 +197,8 @@ export const ControlTransportTable = ({
                 {route.vehicle_route_detail?.who_destination ||
                   "No especificado"}
               </TableCell>
+
+              <TableCell>{route.is_concluded}</TableCell>
 
               <TableCell
                 style={{
@@ -235,6 +247,7 @@ export const ControlTransport = () => {
     createdAt: "",
     id_vehicle: 0,
     state: "INICIADO",
+    is_concluded: "NO",
   });
 
   const handleSelectRoute = (route: VehicleRouteResDto) => {
@@ -269,6 +282,7 @@ export const ControlTransport = () => {
             createdAt: formatToInputDate(route.createdAt),
             id_vehicle: route.id_vehicle,
             state: route.state,
+            is_concluded: route.is_concluded,
           });
         }}
       />

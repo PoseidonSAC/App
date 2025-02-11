@@ -34,23 +34,12 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
 
   const createRoute = async (route: VehicleRouteDto) => {
     await service.create(route);
-    const data = await service.getVehicleRoutes();
-    const sorted = data.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-    setRoutes(sorted);
+    getRoutes();
   };
 
   const updateRoute = async (id: number, route: VehicleRouteDto) => {
     await service.update(id, route);
-    const data = await service.getVehicleRoutes();
-
-    const sorted = data.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-    setRoutes(sorted);
+    getRoutes();
   };
 
   const deleteRoute = async (id: number) => {
@@ -73,6 +62,15 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
     setFilteredRoutes(filtered);
   };
 
+  const getRoutes = async () => {
+    const data = await service.getVehicleRoutes();
+    const sortedData = data.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    setRoutes(sortedData);
+  };
+
   return (
     <VehicleRouteContext.Provider
       value={{
@@ -88,6 +86,7 @@ export const VehicleRouteProvider = ({ children }: ContextProviderProps) => {
         filteredRoutes,
         setFilteredRoutes,
         handleFilter,
+        getRoutes,
       }}
     >
       {children}

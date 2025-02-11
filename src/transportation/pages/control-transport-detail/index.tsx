@@ -716,6 +716,7 @@ const LiquidationResult = () => {
 
 const LiquidationDetail = () => {
   const { routeDetail, updateRoute } = useRouteDetail();
+  const { getRoutes } = useVehicleRoute();
   const [detail, setDetail] = useState<VehicleRouteDetailResDto | null>(null);
   const [isEdit, setIsEdit] = useState(false);
 
@@ -746,6 +747,7 @@ const LiquidationDetail = () => {
         dateEnd: detail.dateEnd ? handleSubmitDate(detail.dateEnd) : null,
       });
       setIsEdit(false);
+      getRoutes();
     }
   };
 
