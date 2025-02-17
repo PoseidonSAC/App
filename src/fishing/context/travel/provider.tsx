@@ -20,6 +20,7 @@ export const TravelProvider = ({ children }: ContextProviderProps) => {
   useEffect(() => {
     const getAll = async () => {
       const data = await service.getAll();
+      console.log(data);
       const sortedData = sortTravels(data);
       setTravels(sortedData);
     };
@@ -28,11 +29,10 @@ export const TravelProvider = ({ children }: ContextProviderProps) => {
 
   const create = async (travel: travelDto) => {
     const data = await service.create(travel);
-
     setTravels(sortTravels([...travels, data]));
   };
 
-  const update = async (id: number, travel: travelDto) => {
+  const update = async (id: number, travel: travelResDto) => {
     await service.update(id, travel);
     setTravels((prevTravels) =>
       prevTravels.map((t) => (t.id === id ? { ...t, ...travel } : t))
@@ -48,6 +48,7 @@ export const TravelProvider = ({ children }: ContextProviderProps) => {
     <TravelContext.Provider
       value={{
         travels,
+        SetTravels: setTravels,
         create,
         update,
         remove,

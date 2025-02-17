@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
 
 import { useTravel } from "../../../context/travel/useContext";
+import { travelResDto } from "../../../domain/dto/travel.dto";
 import {
   Card,
   Box,
@@ -16,7 +17,6 @@ import {
   Modal,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import { travelDto } from "./../../../domain/dto/travel.dto";
 import { useOtherCost } from "./../../../context/other-cost/useContext";
 import { useFishing } from "./../../../context/fishing/useContext";
 import { useChargerOperation } from "../../../context/charger-operation";
@@ -102,7 +102,7 @@ export const TravelDetail = () => {
     setValue,
     control,
     formState: { errors },
-  } = useForm<travelDto>({
+  } = useForm<travelResDto>({
     defaultValues: {
       code: "",
       oil_charge: 0,
@@ -174,7 +174,7 @@ export const TravelDetail = () => {
     }
   }, [travelSelected, reset]);
 
-  const onSubmit = (data: travelDto) => {
+  const onSubmit = (data: travelResDto) => {
     if (travelSelected) {
       const t = {
         ...data,
@@ -184,7 +184,7 @@ export const TravelDetail = () => {
         fishing_date_canceled: formatToISODate(data.fishing_date_canceled),
       };
       update(travelSelected.id, t);
-      SetTravelSelected(t);
+      SetTravelSelected({ ...travelSelected, ...t });
       setIsEditing(false);
     }
   };
@@ -808,7 +808,7 @@ const TravelResume = () => {
 };
 
 const ChargerOperationOfTravel = () => {
-  const { travelSelected } = useTravel();
+  const { travelSelected, SetTravels, travels } = useTravel();
   const { chargerOperation, update, setChargerOperation } =
     useChargerOperation();
   const [isEditing, setIsEditing] = useState(false);
@@ -836,6 +836,12 @@ const ChargerOperationOfTravel = () => {
       await update(chargerOperation.id, c);
 
       setChargerOperation(c);
+      const travelsUpdated: travelResDto[] = travels.map((t) =>
+        t.id === travelSelected?.id ? { ...t, chargerOperation: c } : t
+      );
+
+      SetTravels(travelsUpdated);
+
       setIsEditing(false);
     }
   };

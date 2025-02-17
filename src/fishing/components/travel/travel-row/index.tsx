@@ -31,6 +31,10 @@ export const TravelRow = ({
       <TableCell component={"th"} scope="row">
         {travel.fishing_date_canceled ? "Cancelado" : "No Cancelado"}
       </TableCell>
+
+      <TableCell component={"th"} scope="row">
+        {travel.charger_operation.date_canceled ? "Cancelado" : "No Cancelado"}
+      </TableCell>
     </TableRow>
   );
 };

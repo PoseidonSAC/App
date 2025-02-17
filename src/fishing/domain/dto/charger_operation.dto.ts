@@ -16,6 +16,7 @@ export interface ChargerOperationCreateDto {
 
 export interface ChargerOperationResDto {
   id: number;
+  id_travel: number;
   footboard: number;
   helper: number;
   grocer: number;

@@ -81,7 +81,6 @@ export const ChargerOperationProvider = ({
 
   const update = async (id: number, data: ChargerOperationDto) => {
     await service.update(id, data);
-
     setChargerOperation((prev) => ({ ...prev, ...{ ...data, id } }));
   };
 
