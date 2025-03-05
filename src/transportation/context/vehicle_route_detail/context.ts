@@ -12,6 +12,7 @@ export interface VehicleRouteDetailContextProps {
   VehicleUsegeOilByDestination: (
     destination: string
   ) => Promise<VehicleRouteDetailUseOilDestiny[]>;
+  GetNextRoute: (id: number) => Promise<VehicleRouteDetailResDto>;
 }
 
 export const VehicleRouteDetailContext =

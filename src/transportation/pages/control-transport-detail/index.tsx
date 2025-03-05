@@ -715,6 +715,7 @@ const LiquidationResult = () => {
 };
 
 const LiquidationDetail = () => {
+  const { routes, routeSelected } = useVehicleRoute();
   const { routeDetail, updateRoute } = useRouteDetail();
   const { getRoutes } = useVehicleRoute();
   const [detail, setDetail] = useState<VehicleRouteDetailResDto | null>(null);
@@ -735,8 +736,21 @@ const LiquidationDetail = () => {
     return format(parseISO(date.slice(0, -1)), "yyyy-MM-dd");
   };
 
+  const handleDateShow = (date: string | null) => {
+    if (!date) return "";
+    return format(parseISO(date.slice(0, -1)), "dd-MM-yyyy");
+  };
+
   const handleSubmitDate = (date: string) => {
     return new Date(date).toISOString();
+  };
+
+  const handleDateNumber = (date: string) => {
+    const time = parseISO(date.slice(0, -1)).getTime();
+    if (isNaN(time)) {
+      return 0;
+    }
+    return time;
   };
 
   const handleSubmit = async () => {
@@ -849,6 +863,42 @@ const LiquidationDetail = () => {
               }
               required
             />
+
+            <FormControl fullWidth>
+              <InputLabel id="next-route">Enlazar a Viaje con Fecha</InputLabel>
+              <Select
+                labelId="vehicle-select-label"
+                label="Vehiculo"
+                value={
+                  detail.id_next_route === null ? null : detail.id_next_route
+                }
+                onChange={(e) => {
+                  setDetail({
+                    ...detail,
+                    id_next_route: e.target.value as number,
+                  });
+                }}
+              >
+                {routes
+                  .filter((route) => {
+                    const filterRoutes =
+                      route.id_vehicle === routeSelected?.id_vehicle &&
+                      route.id !== routeSelected?.id &&
+                      handleDateNumber(detail.dateInit) <
+                        handleDateNumber(route.createdAt);
+
+                    return filterRoutes;
+                  })
+                  .map((route) => (
+                    <MenuItem
+                      key={route.vehicle_route_detail?.id}
+                      value={route.vehicle_route_detail?.id}
+                    >
+                      {handleDateShow(route.createdAt)}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
 
             {isEdit ? (
               <Box sx={{ display: "flex", gap: 2, flexDirection: "column" }}>

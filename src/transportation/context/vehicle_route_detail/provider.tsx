@@ -38,6 +38,13 @@ export const RoutesDetailProvider = ({ children }: ContextProviderProps) => {
     return data;
   };
 
+  const GetNextRoute = async (
+    id: number
+  ): Promise<VehicleRouteDetailResDto> => {
+    const data = await service.getById(id);
+    return data;
+  };
+
   return (
     <VehicleRouteDetailContext.Provider
       value={{
@@ -46,6 +53,7 @@ export const RoutesDetailProvider = ({ children }: ContextProviderProps) => {
         getRoute,
         setRouteDetail,
         VehicleUsegeOilByDestination,
+        GetNextRoute,
       }}
     >
       {children}

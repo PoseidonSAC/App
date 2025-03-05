@@ -7,6 +7,7 @@ export interface VehicleRouteDetailDto {
   point_charge: string | null;
   who_destination: string | null;
   destiny: string | null;
+  id_next_route: number | null;
 }
 
 export interface VehicleRouteDetailResDto {
@@ -19,6 +20,7 @@ export interface VehicleRouteDetailResDto {
   point_charge: string | null;
   who_destination: string | null;
   destiny: string | null;
+  id_next_route: number | null;
 }
 
 export interface VehicleRouteDetailUseOilDestiny {
@@ -29,5 +31,7 @@ export interface VehicleRouteDetailUseOilDestiny {
   who_destination: string | null;
   destiny: string | null;
   vehicle: string;
+  id_next_route: number | null;
+
   vehicle_route_oil_usage: number;
 }
