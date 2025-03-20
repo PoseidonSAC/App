@@ -85,7 +85,10 @@ export const TravelCreateForm = ({ close }: TravelCreateFormProps) => {
         <TextField
           fullWidth
           label="Código"
-          {...register("code")}
+          {...register("code", {
+            required: true,
+            onChange: (e) => setValue("code", e.target.value.toUpperCase()),
+          })}
           error={!!errors.code}
           helperText={errors.code ? "Código es requerido" : ""}
         />

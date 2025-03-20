@@ -25,9 +25,6 @@ export const AuthProvider = ({ children }: ContextProviderProps) => {
     if (userSession.status === 200) {
       setUserSession(userSession);
       setIsAuthenticated(true);
-      setTimeout(() => {
-        window.location.reload();
-      }, 3600000);
     }
   };
 

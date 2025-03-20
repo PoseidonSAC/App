@@ -21,7 +21,7 @@ export const Home = () => {
           color: "white",
         }}
       >
-        <Typography variant="h1">JUANY S.A.C</Typography>
+        <Typography variant="h1">Inversiones Juany'S e.I.R.L.</Typography>
       </Box>
       <Box
         sx={{

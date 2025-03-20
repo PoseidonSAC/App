@@ -20,6 +20,7 @@ export const LoginForm = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginData>();
 
@@ -57,8 +58,10 @@ export const LoginForm = () => {
       <Card sx={{ width: "100%", padding: 2, boxShadow: 0 }}>
         <TextField
           fullWidth
-          label="Código"
-          {...register("code")}
+          {...register("code", {
+            required: true,
+            onChange: (e) => setValue("code", e.target.value.toUpperCase()),
+          })}
           error={!!errors.code}
           helperText={errors.code ? "Código es requerido" : ""}
         />

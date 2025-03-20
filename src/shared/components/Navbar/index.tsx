@@ -14,7 +14,7 @@ export const Navbar = () => {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          JUANY S.A.C
+          Inversiones Juany'S e.I.R.L.
         </Typography>
         {location.pathname !== "/inicio" && (
           <Button color="inherit" onClick={() => navigate(-1)}>

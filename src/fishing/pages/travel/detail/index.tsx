@@ -176,6 +176,8 @@ export const TravelDetail = () => {
 
   const onSubmit = (data: travelResDto) => {
     if (travelSelected) {
+      data.is_concluded =
+        data.oil_date_canceled != null && data.fishing_date_canceled != null;
       const t = {
         ...data,
         id: travelSelected.id,
@@ -232,7 +234,10 @@ export const TravelDetail = () => {
             disabled
           />
           <TextField
-            {...register("code")}
+            {...register("code", {
+              required: true,
+              onChange: (e) => setValue("code", e.target.value.toUpperCase()),
+            })}
             label="Código"
             InputProps={{
               style: { color: "black", fontWeight: "bold" },
@@ -378,31 +383,6 @@ export const TravelDetail = () => {
             }}
             disabled={!isEditing}
           />
-
-          {watch("is_concluded") ? (
-            <Button
-              variant="contained"
-              color="error"
-              onClick={() => {
-                setValue("is_concluded", false);
-              }}
-              disabled={!isEditing}
-            >
-              Reabrir
-            </Button>
-          ) : (
-            <Button
-              variant="contained"
-              color="success"
-              onClick={() => {
-                setValue("is_concluded", true);
-              }}
-              disabled={!isEditing}
-            >
-              Concluir
-            </Button>
-          )}
-
           {isEditing ? (
             <Button
               variant="contained"
@@ -477,7 +457,10 @@ const OtherCostTravel = () => {
           sx={{ display: "flex", flexDirection: "column", gap: 1 }}
         >
           <TextField
-            {...register("description")}
+            {...register("description", {
+              onChange: (e) =>
+                setValue("description", e.target.value.toUpperCase()),
+            })}
             label="Descripción"
             required
           />
@@ -614,7 +597,13 @@ const FishingTravel = () => {
           onSubmit={handleSubmit(onSubmit)}
           sx={{ display: "flex", flexDirection: "column", gap: 1 }}
         >
-          <TextField {...register("fish")} label="Pescado" required />
+          <TextField
+            {...register("fish", {
+              onChange: (e) => setValue("fish", e.target.value.toUpperCase()),
+            })}
+            label="Pescado"
+            required
+          />
           <TextField
             {...register("weight", { valueAsNumber: true })}
             label="Peso x Caja"
@@ -737,6 +726,17 @@ const TravelResume = () => {
     (chargerOperation?.footboard || 0) +
     (chargerOperation?.charger || 0) +
     (chargerOperation?.grocer || 0);
+
+  const totalLiquid = totalFishing - totalCost - total_other_cost_added;
+  const repartition = totalLiquid / 2;
+
+  const ToCurrency = (value: number) =>
+    value.toLocaleString("es-PE", {
+      style: "currency",
+      currency: "PEN",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   return (
     <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
       <Typography variant="h5" component="h1" gutterBottom>
@@ -752,33 +752,41 @@ const TravelResume = () => {
         <TableBody>
           <TableRow>
             <TableCell>Efectivo de Pesca</TableCell>
-            <TableCell>{totalFishing}</TableCell>
+            <TableCell>{ToCurrency(totalFishing)}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>Gasto de viaje</TableCell>
-            <TableCell>{totalCost}</TableCell>
+            <TableCell>{ToCurrency(totalCost)}</TableCell>
           </TableRow>
 
           <TableRow>
             <TableCell>Otros Gastos Agregados a la Division</TableCell>
-            <TableCell>{total_other_cost_added}</TableCell>
+            <TableCell>{ToCurrency(total_other_cost_added)}</TableCell>
           </TableRow>
 
           <TableRow>
             <TableCell>Otros Gastos</TableCell>
-            <TableCell>{total_other_cost}</TableCell>
+            <TableCell>{ToCurrency(total_other_cost)}</TableCell>
           </TableRow>
 
           <TableRow>
             <TableCell>Petroleo de Vehiculo</TableCell>
-            <TableCell>{vehicle_cost}</TableCell>
+            <TableCell>{ToCurrency(vehicle_cost)}</TableCell>
           </TableRow>
 
           <TableRow>
             <TableCell>Pago Tripulantes</TableCell>
-            <TableCell>{cost_charge}</TableCell>
+            <TableCell>{ToCurrency(cost_charge)}</TableCell>
           </TableRow>
 
+          <TableRow>
+            <TableCell>Total Liquido</TableCell>
+            <TableCell>{ToCurrency(totalLiquid)}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Repartición</TableCell>
+            <TableCell>{ToCurrency(repartition)}</TableCell>
+          </TableRow>
           <TableRow>
             <TableCell>Numero Cajas</TableCell>
             <TableCell>{total_boxes}</TableCell>
@@ -787,19 +795,6 @@ const TravelResume = () => {
           <TableRow>
             <TableCell>Total Toneladas</TableCell>
             <TableCell>{total_tons}</TableCell>
-          </TableRow>
-
-          <TableRow>
-            <TableCell>Total Liquido</TableCell>
-            <TableCell>
-              {totalFishing - totalCost - total_other_cost_added}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Repartición</TableCell>
-            <TableCell>
-              {(totalFishing - totalCost - total_other_cost_added) / 2}
-            </TableCell>
           </TableRow>
         </TableBody>
       </Table>

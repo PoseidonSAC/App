@@ -36,7 +36,7 @@ export const Login = () => {
             style={{ maxWidth: "25%", height: "auto", borderRadius: "25%" }}
           />
           <Typography variant="h4" component="h1" gutterBottom>
-            JUANY S.A.C
+            Inversiones Juany'S e.I.R.L.
           </Typography>
         </Box>
       </Grid>

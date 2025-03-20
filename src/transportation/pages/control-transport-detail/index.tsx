@@ -15,6 +15,8 @@ import {
   TextField,
   MenuItem,
   Select,
+  Autocomplete,
+  Switch,
 } from "@mui/material";
 
 import { useRouteDetail } from "../../context/vehicle_route_detail";
@@ -392,6 +394,14 @@ const ControlOilJustifited = () => {
     await deleteRouteOilUse(id);
   };
 
+  const options_additional_oil = [
+    "SALIDA LIMA",
+    "PUENTE PIEDRA",
+    "CARGA",
+    "CALLAO",
+    "CORRIDA",
+    "CARGA ILO-MORRO",
+  ];
   return (
     <Box>
       <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
@@ -448,14 +458,28 @@ const ControlOilJustifited = () => {
             }}
             sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
-            <TextField
-              label="Descripción"
+            <Autocomplete
+              options={options_additional_oil}
               value={oilUse.description}
-              onChange={(e) =>
-                setOilUse({ ...oilUse, description: e.target.value })
+              freeSolo
+              onChange={(_, value) =>
+                setOilUse({ ...oilUse, description: value || "" })
               }
-              required
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Descripción"
+                  required
+                  onChange={(e) =>
+                    setOilUse({
+                      ...oilUse,
+                      description: e.target.value.toLocaleUpperCase(),
+                    })
+                  }
+                />
+              )}
             />
+
             <TextField
               label="Uso de Petróleo"
               type="number"
@@ -642,6 +666,15 @@ const LiquidationResult = () => {
 
     setResult(moneySum - costSum - TotalTaxes - balanceSum);
   }, [routeDetail, vehicleRouteBalance, costs, routesMoney, routeSelected]);
+
+  const toCurrency = (value: number) =>
+    value.toLocaleString("es-PE", {
+      style: "currency",
+      currency: "PEN",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
   return (
     <Box
       sx={{
@@ -670,19 +703,21 @@ const LiquidationResult = () => {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography variant="body1">Gastos Balanza:</Typography>
-              <Typography variant="body1">{totalBalance}</Typography>
+              <Typography variant="body1">
+                {toCurrency(totalBalance)}
+              </Typography>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography variant="body1">Otros Gastos:</Typography>
-              <Typography variant="body1">{totalCost}</Typography>
+              <Typography variant="body1">{toCurrency(totalCost)}</Typography>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography variant="body1">Gastos Peajes:</Typography>
-              <Typography variant="body1">{totalTaxes}</Typography>
+              <Typography variant="body1">{toCurrency(totalTaxes)}</Typography>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography variant="body1">Dinero Dado:</Typography>
-              <Typography variant="body1">{totalMoney}</Typography>
+              <Typography variant="body1">{toCurrency(totalMoney)}</Typography>
             </Box>
           </Box>
           <Box
@@ -692,22 +727,29 @@ const LiquidationResult = () => {
               marginY: 2,
             }}
           />
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: 2,
-              fontWeight: "bold",
-            }}
-          >
-            <Typography variant="body1">Saldo:</Typography>
-            <Typography
-              variant="body1"
-              sx={{ color: result >= 0 ? "green" : "red" }}
+
+          {routeDetail?.changeGiven ? (
+            <Typography variant="body1">Vuelto Entregado</Typography>
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginTop: 2,
+                fontWeight: "bold",
+              }}
             >
-              {result >= 0 ? `A devolver: ${result}` : `A pagar: ${result}`}
-            </Typography>
-          </Box>
+              <Typography variant="body1">Saldo:</Typography>
+              <Typography
+                variant="body1"
+                sx={{ color: result >= 0 ? "green" : "red" }}
+              >
+                {result >= 0
+                  ? `A devolver: ${toCurrency(result)}`
+                  : `A pagar: ${toCurrency(result)}`}
+              </Typography>
+            </Box>
+          )}
         </Card>
       </Box>
     </Box>
@@ -720,6 +762,12 @@ const LiquidationDetail = () => {
   const { getRoutes } = useVehicleRoute();
   const [detail, setDetail] = useState<VehicleRouteDetailResDto | null>(null);
   const [isEdit, setIsEdit] = useState(false);
+
+  const options_destiny = ["VENTANILLA", "VILLAMARIA", "PIURA"];
+
+  const options_point_charge = ["PAITA", "TUMBES", "MATARANI", "ILO", "MORRO"];
+
+  const options_who_destination = ["ANA", "NATALY"];
 
   useEffect(() => {
     if (routeDetail) {
@@ -746,7 +794,8 @@ const LiquidationDetail = () => {
   };
 
   const handleDateNumber = (date: string) => {
-    const time = parseISO(date.slice(0, -1)).getTime();
+    const time = parseISO(date.split("T")[0]).getTime();
+    console.log(time);
     if (isNaN(time)) {
       return 0;
     }
@@ -804,44 +853,85 @@ const LiquidationDetail = () => {
               }
               InputLabelProps={{ shrink: true }}
             />
-            <TextField
-              label="Destino"
-              type="text"
-              disabled={!isEdit}
-              value={detail.destiny || ""}
-              onChange={(e) =>
-                setDetail({ ...detail, destiny: e.target.value })
-              }
-              InputLabelProps={{ shrink: true }}
-            />
 
-            <TextField
-              label="Punto Carga"
-              type="text"
-              disabled={!isEdit}
+            <Autocomplete
+              options={options_point_charge}
               value={detail.point_charge || ""}
-              onChange={(e) =>
-                setDetail({ ...detail, point_charge: e.target.value })
+              disabled={!isEdit}
+              freeSolo
+              onChange={(_, value) =>
+                setDetail({
+                  ...detail,
+                  point_charge: value,
+                })
               }
-              InputLabelProps={{ shrink: true }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  InputLabelProps={{ shrink: true }}
+                  label="Punto de Carga"
+                  onChange={(e) =>
+                    setDetail({
+                      ...detail,
+                      point_charge: e.target.value.toUpperCase(),
+                    })
+                  }
+                />
+              )}
             />
 
-            <TextField
-              label="Quien Liquida "
-              type="text"
+            <Autocomplete
+              options={options_destiny}
+              value={detail.destiny || ""}
               disabled={!isEdit}
+              onChange={(_, value) => setDetail({ ...detail, destiny: value })}
+              freeSolo
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  InputLabelProps={{ shrink: true }}
+                  onChange={(e) =>
+                    setDetail({
+                      ...detail,
+                      destiny: e.target.value.toUpperCase(),
+                    })
+                  }
+                  label="Destino"
+                />
+              )}
+            />
+
+            <Autocomplete
+              options={options_who_destination}
               value={detail.who_destination || ""}
-              onChange={(e) =>
-                setDetail({ ...detail, who_destination: e.target.value })
+              disabled={!isEdit}
+              onChange={(_, value) =>
+                setDetail({
+                  ...detail,
+                  who_destination: value,
+                })
               }
-              InputLabelProps={{ shrink: true }}
+              freeSolo
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  InputLabelProps={{ shrink: true }}
+                  label="Quien Liquida"
+                  onChange={(e) =>
+                    setDetail({
+                      ...detail,
+                      who_destination: e.target.value.toUpperCase(),
+                    })
+                  }
+                />
+              )}
             />
 
             <TextField
               label="Peajes Salida"
               type="number"
               disabled={!isEdit}
-              value={detail.taxes_in}
+              value={detail.taxes_in.toFixed(2)}
               onChange={(e) =>
                 setDetail({
                   ...detail,
@@ -854,7 +944,7 @@ const LiquidationDetail = () => {
               label="Peajes Retorno"
               type="number"
               disabled={!isEdit}
-              value={detail.taxes_out}
+              value={detail.taxes_out.toFixed(2)}
               onChange={(e) =>
                 setDetail({
                   ...detail,
@@ -864,8 +954,24 @@ const LiquidationDetail = () => {
               required
             />
 
-            <FormControl fullWidth>
+            <FormControl fullWidth disabled={!isEdit}>
+              <InputLabel id="change-given" shrink>
+                Vuelto Fue Entregado
+              </InputLabel>
+              <Switch
+                id="changeGiven"
+                checked={detail.changeGiven}
+                onChange={() =>
+                  setDetail({
+                    ...detail,
+                    changeGiven: !detail.changeGiven,
+                  })
+                }
+              />
+            </FormControl>
+            <FormControl fullWidth disabled={!isEdit}>
               <InputLabel id="next-route">Enlazar a Viaje con Fecha</InputLabel>
+
               <Select
                 labelId="vehicle-select-label"
                 label="Vehiculo"
@@ -875,10 +981,11 @@ const LiquidationDetail = () => {
                 onChange={(e) => {
                   setDetail({
                     ...detail,
-                    id_next_route: e.target.value as number,
+                    id_next_route: e.target.value as number | null,
                   });
                 }}
               >
+                <MenuItem value={""}>Ninguno</MenuItem>
                 {routes
                   .filter((route) => {
                     const filterRoutes =
@@ -977,6 +1084,8 @@ const LiquidationOtherCost = () => {
     await deleteCost(id);
   };
 
+  const options_other_cost = ["LAVADA", "PESADA", "CALIBRADA LLANTA"];
+
   return (
     <Box>
       <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
@@ -1028,14 +1137,27 @@ const LiquidationOtherCost = () => {
             }}
             sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
-            <TextField
-              label="Descripción"
+            <Autocomplete
+              options={options_other_cost}
               value={cost.description}
-              onChange={(e) =>
-                setCost({ ...cost, description: e.target.value })
+              freeSolo
+              onChange={(_, value) =>
+                setCost({ ...cost, description: value || "" })
               }
-              required
-            />
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Descripción"
+                  required
+                  onChange={(e) =>
+                    setCost({
+                      ...cost,
+                      description: e.target.value.toUpperCase(),
+                    })
+                  }
+                />
+              )}
+            ></Autocomplete>
             <TextField
               label="Precio"
               type="number"
@@ -1079,6 +1201,10 @@ const LiquidationMoneyConcern = () => {
     type: "",
     id_vehicle_route: routeSelected?.id || 0,
   });
+
+  const optionsGivenBy = ["ANA", "JUAN", "CHICHO", "NATALY"];
+  const optionsDescription = ["SALIDA", "RETORNO"];
+  const optionsType = ["EFECTIVO", "DEPOSITO"];
 
   const [open, setOpen] = useState(false);
 
@@ -1183,14 +1309,50 @@ const LiquidationMoneyConcern = () => {
             }}
             sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
-            <TextField
-              label="Descripción"
+            <Autocomplete
+              options={optionsDescription}
               value={money.description}
-              onChange={(e) =>
-                setMoney({ ...money, description: e.target.value })
+              freeSolo
+              onChange={(_, value) =>
+                setMoney({ ...money, description: value || "" })
               }
-              required
-            />
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Descripción"
+                  required
+                  onChange={(e) =>
+                    setMoney({
+                      ...money,
+                      description: e.target.value.toUpperCase(),
+                    })
+                  }
+                />
+              )}
+            ></Autocomplete>
+
+            <Autocomplete
+              options={optionsGivenBy}
+              value={money.givenby}
+              freeSolo
+              onChange={(_, value) =>
+                setMoney({ ...money, givenby: value || "" })
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Entregado Por"
+                  required
+                  onChange={(e) =>
+                    setMoney({
+                      ...money,
+                      givenby: e.target.value.toUpperCase(),
+                    })
+                  }
+                />
+              )}
+            ></Autocomplete>
+
             <TextField
               label="Monto"
               type="number"
@@ -1200,18 +1362,26 @@ const LiquidationMoneyConcern = () => {
               }
               required
             />
-            <TextField
-              label="Entregado Por"
-              value={money.givenby}
-              onChange={(e) => setMoney({ ...money, givenby: e.target.value })}
-              required
-            />
-            <TextField
-              label="Tipo"
+            <Autocomplete
+              options={optionsType}
               value={money.type}
-              onChange={(e) => setMoney({ ...money, type: e.target.value })}
-              required
-            />
+              freeSolo
+              onChange={(_, value) => setMoney({ ...money, type: value || "" })}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Tipo"
+                  required
+                  onChange={(e) =>
+                    setMoney({
+                      ...money,
+                      type: e.target.value.toUpperCase(),
+                    })
+                  }
+                />
+              )}
+            ></Autocomplete>
+
             <Button variant="contained" type="submit">
               {editMode ? "Actualizar" : "Guardar"}
             </Button>
@@ -1255,6 +1425,7 @@ const LiquidationBalance = () => {
     });
   };
 
+  const options_place = ["SULLANA", "CHICAMA", "ANCON"];
   const handleSubmit = async () => {
     if (!routeSelected) return;
     if (!editMode) {
@@ -1294,7 +1465,7 @@ const LiquidationBalance = () => {
           <TableHead>
             <TableRow>
               <TableCell>Lugar</TableCell>
-              <TableCell>Balance</TableCell>
+              <TableCell>Monto</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>
           </TableHead>
@@ -1337,16 +1508,29 @@ const LiquidationBalance = () => {
             }}
             sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
-            <TextField
-              label="Lugar"
+            <Autocomplete
+              options={options_place}
               value={balance.place}
-              onChange={(e) =>
-                setBalance({ ...balance, place: e.target.value })
+              freeSolo
+              onChange={(_, value) =>
+                setBalance({ ...balance, place: value || "" })
               }
-              required
-            />
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Lugar"
+                  required
+                  onChange={(e) =>
+                    setBalance({
+                      ...balance,
+                      place: e.target.value.toUpperCase(),
+                    })
+                  }
+                />
+              )}
+            ></Autocomplete>
             <TextField
-              label="Balance"
+              label="Monto"
               type="number"
               value={balance.balance}
               onChange={(e) =>
