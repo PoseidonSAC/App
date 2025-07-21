@@ -1,9 +1,11 @@
+import { BoatDto } from "./boat.dto";
 import {
   ChargerOperationResDto,
   ChargerOperationDto,
 } from "./charger_operation.dto";
 
 export interface travelDto {
+  id_boat: number;
   oil_charge: number;
   oil_charger_price: number;
   oil_consume: number;
@@ -20,6 +22,7 @@ export interface travelDto {
   oil_vehicle_price: number;
   oil_vehicle_date_canceled: string | null;
   charger_operation?: ChargerOperationDto;
+  boat?: BoatDto;
 }
 
 export interface travelResDto {
@@ -40,4 +43,6 @@ export interface travelResDto {
   oil_vehicle_date_canceled: string | null;
   id: number;
   charger_operation: ChargerOperationResDto;
+  id_boat: number;
+  boat: BoatDto;
 }

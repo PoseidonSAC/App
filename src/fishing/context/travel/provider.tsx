@@ -3,9 +3,11 @@ import { TravelContext } from "./context";
 import { ContextProviderProps } from "./../../../shared/types/contextProviderProps";
 import { TravelService } from "../../services/travel.service";
 import { travelDto, travelResDto } from "./../../domain/dto/travel.dto";
+import { useBoat } from "../boat";
 
 export const TravelProvider = ({ children }: ContextProviderProps) => {
   const service = new TravelService();
+  const { boat } = useBoat();
   const [travelSelected, SetTravelSelected] = useState<travelResDto | null>(
     null
   );
@@ -19,16 +21,19 @@ export const TravelProvider = ({ children }: ContextProviderProps) => {
 
   useEffect(() => {
     const getAll = async () => {
-      const data = await service.getAll();
-      console.log(data);
+      if (!boat?.id) return;
+      setTravels([]);
+      const data = await service.getAllByBoatId(boat?.id);
       const sortedData = sortTravels(data);
       setTravels(sortedData);
     };
     getAll();
-  }, []);
+  }, [boat]);
 
   const create = async (travel: travelDto) => {
-    const data = await service.create(travel);
+    if (!boat?.id) return;
+    console.log("Creating travel with boat ID:", boat.id);
+    const data = await service.create({ ...travel, id_boat: boat?.id });
     setTravels(sortTravels([...travels, data]));
   };
 
@@ -44,6 +49,12 @@ export const TravelProvider = ({ children }: ContextProviderProps) => {
     setTravels(travels.filter((t) => t.id !== id));
   };
 
+  const getById = async (id: number) => {
+    const travelData = await service.getById(id);
+    SetTravelSelected(travelData);
+    return travelData;
+  };
+
   return (
     <TravelContext.Provider
       value={{
@@ -54,6 +65,7 @@ export const TravelProvider = ({ children }: ContextProviderProps) => {
         remove,
         travelSelected,
         SetTravelSelected,
+        getById,
       }}
     >
       {children}

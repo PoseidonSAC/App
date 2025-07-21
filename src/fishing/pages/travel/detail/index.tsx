@@ -221,6 +221,9 @@ export const TravelDetail = () => {
       )}
       <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
         <Typography variant="h5" component="h1" gutterBottom>
+          Lancha : {travelSelected.boat?.name || "No asignada"}
+        </Typography>
+        <Typography variant="h5" component="h1" gutterBottom>
           Detalle del viaje
         </Typography>
 

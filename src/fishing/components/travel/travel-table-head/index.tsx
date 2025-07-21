@@ -6,8 +6,10 @@ export const TravelTableHead = () => {
       <TableRow>
         <TableCell>Codigo</TableCell>
         <TableCell>Creado</TableCell>
-        <TableCell>Pago Pesca</TableCell>
         <TableCell>Pago Tripulantes</TableCell>
+        <TableCell>Pago Petroleo Lancha</TableCell>
+        <TableCell>Pago Estibadores</TableCell>
+        <TableCell>Pago Petroleo Carro</TableCell>
       </TableRow>
     </TableHead>
   );

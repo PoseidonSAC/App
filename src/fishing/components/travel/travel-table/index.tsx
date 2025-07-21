@@ -14,9 +14,9 @@ export interface TravelTableProps {
 
 export const TravelTable = ({ travels }: TravelTableProps) => {
   const navigate = useNavigate();
-  const { SetTravelSelected } = useTravel();
+  const { getById } = useTravel();
   const goToDetail = (travel: travelResDto) => {
-    SetTravelSelected(travel);
+    getById(travel.id);
     navigate(`/pesca/viaje/${travel.id}`);
   };
   const dateFormater = (date: string) => {

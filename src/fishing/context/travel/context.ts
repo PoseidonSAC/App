@@ -9,6 +9,7 @@ export interface TravelContextProps {
   travelSelected: travelResDto | null;
   SetTravelSelected: (travel: travelResDto | null) => void;
   SetTravels: (travels: travelResDto[]) => void;
+  getById: (id: number) => Promise<travelResDto>;
 }
 
 export const TravelContext = createContext<TravelContextProps | null>(null);
