@@ -20,6 +20,7 @@ const defaultValues: travelDto = {
   oil_vehicle: 0,
   oil_vehicle_price: 0,
   oil_vehicle_date_canceled: null,
+  id_boat: 1,
 };
 
 export interface TravelCreateFormProps {
