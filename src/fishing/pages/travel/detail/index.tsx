@@ -778,7 +778,7 @@ const TravelResume = () => {
           </TableRow>
 
           <TableRow>
-            <TableCell>Pago Tripulantes</TableCell>
+            <TableCell>Pago Estibadores</TableCell>
             <TableCell>{ToCurrency(cost_charge)}</TableCell>
           </TableRow>
 
@@ -859,7 +859,7 @@ const ChargerOperationOfTravel = () => {
   return (
     <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2, m: 2 }}>
       <Typography variant="h5" component="h1" gutterBottom>
-        Pagos de Tripulantes
+        Pagos de Estibadores
       </Typography>
       {chargerOperation.date_canceled && (
         <Box
