@@ -46,7 +46,6 @@ api.interceptors.response.use(
           .catch((err) => Promise.reject(err));
       }
 
-      console.log("Token expired, refreshing...");
       originalRequest._retry = true;
       isRefreshing = true;
 
