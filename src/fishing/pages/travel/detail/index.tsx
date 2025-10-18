@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { SyntheticEvent } from "react";
 import { format, parseISO } from "date-fns";
 
 import { useTravel } from "../../../context/travel/useContext";
@@ -31,7 +32,8 @@ import { FishingDto, FishingResDto } from "./../../../domain/dto/fishing.dto";
 import { useNavigate, useParams } from "react-router-dom";
 import { TankPriceControl } from "../../../components/tank-price/tank-price-control";
 import { useTankPrice } from "../../../context/tank-price/useContext";
-import { getRecentOptions, addRecentOption } from "../../../../shared/utils/recentOptions";
+import { getRecentOptions } from "../../../../shared/utils/recentOptions";
+import Autocomplete, { AutocompleteRenderInputParams } from "@mui/material/Autocomplete";
 
 const toCurrency = (value: number) =>
   value.toLocaleString("es-PE", {
@@ -73,7 +75,14 @@ export const TravelDetailPage = () => {
           py: 1.5,
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, alignItems: "flex-start" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 0.5,
+            alignItems: "flex-start",
+          }}
+        >
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             Viaje {travelSelected.code}
           </Typography>
@@ -82,7 +91,8 @@ export const TravelDetailPage = () => {
               Lancha: {travelSelected.boat?.name || "No asignada"}
             </Typography>
             <Typography variant="body1">
-              Fecha: {travelSelected.createdAt
+              Fecha:{" "}
+              {travelSelected.createdAt
                 ? format(
                     parseISO(travelSelected.createdAt.slice(0, -1)),
                     "dd/MM/yyyy"
@@ -516,7 +526,8 @@ const OtherCostTravel = () => {
       const next = [
         (data.description || "").trim(),
         ...costOptions.filter(
-          (x) => x.toLowerCase() !== (data.description || "").trim().toLowerCase()
+          (x) =>
+            x.toLowerCase() !== (data.description || "").trim().toLowerCase()
         ),
       ]
         .filter(Boolean)
@@ -557,8 +568,11 @@ const OtherCostTravel = () => {
             freeSolo
             options={costOptions}
             value={watch("description") || ""}
-            onInputChange={(_, v) => setValue("description", (v || "").toUpperCase())}
-            renderInput={(params) => (
+            onInputChange={(event: SyntheticEvent, value: string) => {
+              void event;
+              setValue("description", (value || "").toUpperCase());
+            }}
+            renderInput={(params: AutocompleteRenderInputParams) => (
               <TextField {...params} label="Descripci�n" required />
             )}
           />
@@ -568,7 +582,8 @@ const OtherCostTravel = () => {
                 setValue("description", e.target.value.toUpperCase()),
             })}
             label="Descripción"
-            required sx={{ display: "none" }}
+            required
+            sx={{ display: "none" }}
           />
           <TextField
             {...register("price", { valueAsNumber: true })}
@@ -729,8 +744,11 @@ const FishingTravel = () => {
             freeSolo
             options={fishOptions}
             value={watch("fish") || ""}
-            onInputChange={(_, v) => setValue("fish", (v || "").toUpperCase())}
-            renderInput={(params) => (
+            onInputChange={(event: SyntheticEvent, value: string) => {
+              void event;
+              setValue("fish", (value || "").toUpperCase());
+            }}
+            renderInput={(params: AutocompleteRenderInputParams) => (
               <TextField {...params} label="Pescado" required />
             )}
           />

@@ -26,6 +26,9 @@ export const addRecentOption = (key: string, value: string) => {
   if (items.length > MAX_ITEMS) items = items.slice(0, MAX_ITEMS);
   try {
     localStorage.setItem(key, JSON.stringify(items));
-  } catch {}
+  } catch (e) {
+    // Log the error so empty catch blocks are avoided and failures can be diagnosed
+    // eslint-disable-next-line no-console
+    console.warn("Failed to save recent options to localStorage:", e);
+  }
 };
-
