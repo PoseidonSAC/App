@@ -31,6 +31,7 @@ import { FishingDto, FishingResDto } from "./../../../domain/dto/fishing.dto";
 import { useNavigate, useParams } from "react-router-dom";
 import { TankPriceControl } from "../../../components/tank-price/tank-price-control";
 import { useTankPrice } from "../../../context/tank-price/useContext";
+import { getRecentOptions, addRecentOption } from "../../../../shared/utils/recentOptions";
 
 const toCurrency = (value: number) =>
   value.toLocaleString("es-PE", {
@@ -494,6 +495,16 @@ const OtherCostTravel = () => {
     },
   });
 
+  const RECENT_COST_KEY = "recent_other_cost_descriptions";
+  const [costOptions, setCostOptions] = useState<string[]>([]);
+  useEffect(() => {
+    try {
+      setCostOptions(getRecentOptions(RECENT_COST_KEY));
+    } catch {
+      setCostOptions([]);
+    }
+  }, []);
+
   const onSubmit = async (data: OtherCostTravelDto) => {
     if (selectedCost) {
       await update(selectedCost.id, data);
@@ -501,6 +512,18 @@ const OtherCostTravel = () => {
     } else {
       await create(data);
     }
+    try {
+      const next = [
+        (data.description || "").trim(),
+        ...costOptions.filter(
+          (x) => x.toLowerCase() !== (data.description || "").trim().toLowerCase()
+        ),
+      ]
+        .filter(Boolean)
+        .slice(0, 50);
+      localStorage.setItem(RECENT_COST_KEY, JSON.stringify(next));
+      setCostOptions(next);
+    } catch {}
     reset();
   };
 
@@ -530,13 +553,22 @@ const OtherCostTravel = () => {
           onSubmit={handleSubmit(onSubmit)}
           sx={{ display: "flex", flexDirection: "column", gap: 1 }}
         >
+          <Autocomplete
+            freeSolo
+            options={costOptions}
+            value={watch("description") || ""}
+            onInputChange={(_, v) => setValue("description", (v || "").toUpperCase())}
+            renderInput={(params) => (
+              <TextField {...params} label="Descripci�n" required />
+            )}
+          />
           <TextField
             {...register("description", {
               onChange: (e) =>
                 setValue("description", e.target.value.toUpperCase()),
             })}
             label="Descripción"
-            required
+            required sx={{ display: "none" }}
           />
           <TextField
             {...register("price", { valueAsNumber: true })}
@@ -625,7 +657,7 @@ const FishingTravel = () => {
   const [selectedFishing, setSelectedFishing] = useState<FishingResDto | null>(
     null
   );
-  const { register, handleSubmit, reset, setValue } = useForm({
+  const { register, handleSubmit, reset, setValue, watch } = useForm({
     defaultValues: {
       fish: "",
       weight: 0,
@@ -634,6 +666,16 @@ const FishingTravel = () => {
       id_travel: 0,
     },
   });
+  const [fishOptions, setFishOptions] = useState<string[]>([]);
+  const RECENT_FISH_KEY = "recent_fish_names";
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(RECENT_FISH_KEY);
+      setFishOptions(raw ? JSON.parse(raw) : []);
+    } catch {
+      setFishOptions([]);
+    }
+  }, []);
 
   const onSubmit = async (data: FishingDto) => {
     if (selectedFishing) {
@@ -642,6 +684,18 @@ const FishingTravel = () => {
     } else {
       await create(data);
     }
+    try {
+      const next = [
+        (data.fish || "").trim(),
+        ...fishOptions.filter(
+          (x) => x.toLowerCase() !== (data.fish || "").trim().toLowerCase()
+        ),
+      ]
+        .filter(Boolean)
+        .slice(0, 50);
+      localStorage.setItem(RECENT_FISH_KEY, JSON.stringify(next));
+      setFishOptions(next);
+    } catch {}
     reset();
   };
 
@@ -671,12 +725,14 @@ const FishingTravel = () => {
           onSubmit={handleSubmit(onSubmit)}
           sx={{ display: "flex", flexDirection: "column", gap: 1 }}
         >
-          <TextField
-            {...register("fish", {
-              onChange: (e) => setValue("fish", e.target.value.toUpperCase()),
-            })}
-            label="Pescado"
-            required
+          <Autocomplete
+            freeSolo
+            options={fishOptions}
+            value={watch("fish") || ""}
+            onInputChange={(_, v) => setValue("fish", (v || "").toUpperCase())}
+            renderInput={(params) => (
+              <TextField {...params} label="Pescado" required />
+            )}
           />
           <TextField
             {...register("weight", { valueAsNumber: true })}
