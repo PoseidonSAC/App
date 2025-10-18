@@ -21,6 +21,7 @@ import { BoatDto } from "../../../domain/dto/boat.dto";
 import EditIcon from "@mui/icons-material/Edit"; // Corrige el import
 import DeleteIcon from "@mui/icons-material/Delete"; // Corrige el import
 import { travelResDto } from "../../../domain/dto/travel.dto";
+import { TankPriceControl } from "../../../components/tank-price/tank-price-control";
 
 export const TravelCreateModal = () => {
   const [open, setOpen] = useState(false);
@@ -346,7 +347,10 @@ export const TravelPage = () => {
     <Box>
       <LanchaSelect />
       <Box sx={{ padding: 2 }}>
-        <TravelCreateModal />
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+          <TravelCreateModal />
+          <TankPriceControl />
+        </Box>
         <TravelTable travels={travels} />
       </Box>
     </Box>

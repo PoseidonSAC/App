@@ -6,22 +6,25 @@ import { FishingProvider } from "../context/fishing";
 import { TravelDetailPage } from "../pages/travel/detail";
 import { ChargerOperationProvider } from "../context/charger-operation";
 import { BoatProvider } from "../context/boat";
+import { TankPriceProvider } from "../context/tank-price/provider";
 
 export const PescaRoutes = () => {
   return (
     <BoatProvider>
-      <TravelProvider>
-        <OtherCostTravelProvider>
-          <FishingProvider>
-            <ChargerOperationProvider>
-              <Routes>
-                <Route path="/" element={<TravelPage />} />
-                <Route path="/viaje/:id" element={<TravelDetailPage />} />
-              </Routes>
-            </ChargerOperationProvider>
-          </FishingProvider>
-        </OtherCostTravelProvider>
-      </TravelProvider>
+      <TankPriceProvider>
+        <TravelProvider>
+          <OtherCostTravelProvider>
+            <FishingProvider>
+              <ChargerOperationProvider>
+                <Routes>
+                  <Route path="/" element={<TravelPage />} />
+                  <Route path="/viaje/:id" element={<TravelDetailPage />} />
+                </Routes>
+              </ChargerOperationProvider>
+            </FishingProvider>
+          </OtherCostTravelProvider>
+        </TravelProvider>
+      </TankPriceProvider>
     </BoatProvider>
   );
 };

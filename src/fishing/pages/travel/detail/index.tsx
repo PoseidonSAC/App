@@ -15,6 +15,8 @@ import {
   TableCell,
   TableHead,
   Modal,
+  InputAdornment,
+  Chip,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useOtherCost } from "./../../../context/other-cost/useContext";
@@ -26,14 +28,77 @@ import {
 } from "../../../domain/dto/other_cost_travel.dto";
 
 import { FishingDto, FishingResDto } from "./../../../domain/dto/fishing.dto";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { TankPriceControl } from "../../../components/tank-price/tank-price-control";
+import { useTankPrice } from "../../../context/tank-price/useContext";
+
+const toCurrency = (value: number) =>
+  value.toLocaleString("es-PE", {
+    style: "currency",
+    currency: "PEN",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
 export const TravelDetailPage = () => {
   const [open, setOpen] = useState(false);
+  const { id } = useParams();
+  const { travelSelected, getById, SetTravelSelected } = useTravel();
+
+  useEffect(() => {
+    if (id) {
+      getById(Number(id));
+    }
+    return () => {
+      SetTravelSelected(null);
+    };
+  }, [id]);
+
+  if (!id || !travelSelected || travelSelected.id !== Number(id)) {
+    return <Typography variant="h6">Cargando viaje…</Typography>;
+  }
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "end", p: 2 }}>
+      <Box
+        sx={{
+          position: "sticky",
+          top: 0,
+          zIndex: 1100,
+          bgcolor: "background.paper",
+          borderBottom: 1,
+          borderColor: "divider",
+          px: 2,
+          py: 1.5,
+        }}
+      >
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, alignItems: "flex-start" }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            Viaje {travelSelected.code}
+          </Typography>
+          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+            <Typography variant="body1">
+              Lancha: {travelSelected.boat?.name || "No asignada"}
+            </Typography>
+            <Typography variant="body1">
+              Fecha: {travelSelected.createdAt
+                ? format(
+                    parseISO(travelSelected.createdAt.slice(0, -1)),
+                    "dd/MM/yyyy"
+                  )
+                : "-"}
+            </Typography>
+            <Chip
+              size="small"
+              label={travelSelected.is_concluded ? "Concluido" : "En curso"}
+              color={travelSelected.is_concluded ? "success" : "warning"}
+              variant="filled"
+            />
+          </Box>
+        </Box>
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between", p: 2 }}>
+        <TankPriceControl />
         <Button
           variant="contained"
           color="error"
@@ -141,15 +206,15 @@ export const TravelDetail = () => {
 
   const oilCharge = watch("oil_charge");
   const oilConsume = watch("oil_consume");
-  const defaultPricePerUnit = 680;
+  const { price: tankPrice } = useTankPrice();
 
   useEffect(() => {
-    setValue("oil_charger_price", oilCharge * defaultPricePerUnit);
-  }, [oilCharge, setValue]);
+    setValue("oil_charger_price", oilCharge * tankPrice);
+  }, [oilCharge, tankPrice, setValue]);
 
   useEffect(() => {
-    setValue("oil_consume_price", oilConsume * defaultPricePerUnit);
-  }, [oilConsume, setValue]);
+    setValue("oil_consume_price", oilConsume * tankPrice);
+  }, [oilConsume, tankPrice, setValue]);
 
   useEffect(() => {
     if (travelSelected) {
@@ -230,7 +295,7 @@ export const TravelDetail = () => {
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           <TextField
             label="Gasto de Viaje"
-            value={totalCost}
+            value={toCurrency(totalCost)}
             InputProps={{
               style: { color: "black", fontWeight: "bold" },
             }}
@@ -291,6 +356,9 @@ export const TravelDetail = () => {
                 }
                 InputProps={{
                   style: { color: "black", fontWeight: "bold" },
+                  startAdornment: (
+                    <InputAdornment position="start">S/</InputAdornment>
+                  ),
                 }}
                 disabled={!isEditing}
               />
@@ -336,6 +404,9 @@ export const TravelDetail = () => {
                 }
                 InputProps={{
                   style: { color: "black", fontWeight: "bold" },
+                  startAdornment: (
+                    <InputAdornment position="start">S/</InputAdornment>
+                  ),
                 }}
                 disabled={!isEditing}
               />
@@ -521,7 +592,7 @@ const OtherCostTravel = () => {
           {otherCostTravels.map((otherCost) => (
             <TableRow key={otherCost.id}>
               <TableCell>{otherCost.description}</TableCell>
-              <TableCell>{otherCost.price}</TableCell>
+              <TableCell>{toCurrency(otherCost.price)}</TableCell>
               <TableCell>
                 {otherCost.is_added ? "A la Division" : "No a la Division"}
               </TableCell>
@@ -661,9 +732,9 @@ const FishingTravel = () => {
               <TableCell>{fishing.fish}</TableCell>
               <TableCell>{fishing.weight}</TableCell>
               <TableCell>{fishing.boxes}</TableCell>
-              <TableCell>{fishing.price}</TableCell>
+              <TableCell>{toCurrency(fishing.price)}</TableCell>
               <TableCell>
-                {fishing.weight * fishing.boxes * fishing.price}
+                {toCurrency(fishing.weight * fishing.boxes * fishing.price)}
               </TableCell>
               <TableCell>
                 <Button variant="contained" onClick={() => handleEdit(fishing)}>
@@ -888,19 +959,22 @@ const ChargerOperationOfTravel = () => {
           </Typography>
           <Typography sx={{ fontWeight: "bold", mt: 2 }}>Pagos</Typography>
           <Typography sx={{ ml: 2 }}>
-            Estibador: {chargerOperation.footboard}
+            Estibador: {toCurrency(chargerOperation.footboard)}
           </Typography>
           <Typography sx={{ ml: 2 }}>
-            Bodeguero: {chargerOperation.charger}
+            Bodeguero: {toCurrency(chargerOperation.charger)}
           </Typography>
           <Typography sx={{ ml: 2 }}>
-            Cajero: {chargerOperation.grocer}
+            Cajero: {toCurrency(chargerOperation.grocer)}
           </Typography>
           <TextField
             label="Ayudante"
             value={helper}
             InputProps={{
               style: { color: "black", fontWeight: "bold" },
+              startAdornment: (
+                <InputAdornment position="start">S/</InputAdornment>
+              ),
             }}
             disabled={!isEditing}
             type="number"
@@ -911,6 +985,9 @@ const ChargerOperationOfTravel = () => {
             value={travelCost}
             InputProps={{
               style: { color: "black", fontWeight: "bold" },
+              startAdornment: (
+                <InputAdornment position="start">S/</InputAdornment>
+              ),
             }}
             disabled={!isEditing}
             type="number"
@@ -934,11 +1011,13 @@ const ChargerOperationOfTravel = () => {
 
           <Typography>
             Total :
-            {chargerOperation.footboard +
-              chargerOperation.charger +
-              chargerOperation.grocer +
-              helper +
-              travelCost}
+            {toCurrency(
+              chargerOperation.footboard +
+                chargerOperation.charger +
+                chargerOperation.grocer +
+                helper +
+                travelCost
+            )}
           </Typography>
         </Box>
       }

@@ -5,7 +5,6 @@ import { TravelTableHead } from "../travel-table-head";
 
 import { travelResDto } from "../../../domain/dto/travel.dto";
 import { useNavigate } from "react-router-dom";
-import { useTravel } from "./../../../context/travel/useContext";
 import { format } from "date-fns";
 
 export interface TravelTableProps {
@@ -14,9 +13,7 @@ export interface TravelTableProps {
 
 export const TravelTable = ({ travels }: TravelTableProps) => {
   const navigate = useNavigate();
-  const { getById } = useTravel();
   const goToDetail = (travel: travelResDto) => {
-    getById(travel.id);
     navigate(`/pesca/viaje/${travel.id}`);
   };
   const dateFormater = (date: string) => {

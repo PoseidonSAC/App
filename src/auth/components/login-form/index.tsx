@@ -64,6 +64,7 @@ export const LoginForm = () => {
           })}
           error={!!errors.code}
           helperText={errors.code ? "Código es requerido" : ""}
+          autoComplete="username"
         />
       </Card>
       <Card sx={{ width: "100%", padding: 2, boxShadow: 0 }}>
