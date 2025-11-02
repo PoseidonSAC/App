@@ -13,12 +13,6 @@ export class AuthService {
     data.status = response.status;
     return data;
   }
-  async validateToken(): Promise<LoginResDto | null> {
-    const response = await api.post(`${this.apiUrl}/validate-token`);
-    const data: LoginResDto = response.data;
-    data.status = response.status;
-    return data;
-  }
 
   async logout(): Promise<void> {
     await api.post(`${this.apiUrl}/logout`);
